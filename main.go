@@ -10,9 +10,13 @@ func main() {
 
 	filePath := "storage/cat.mp4"
 
-	if err := segmentFile(filePath); err != nil {
-		log.Println("Something went wrong: ", err.Error())
+	segFileData, err := segmentFile(filePath)
+
+	if err != nil {
+		log.Println("Cannot segment Files:", err.Error())
 		return
 	}
+
+	jointBLFiles(*segFileData)
 
 }

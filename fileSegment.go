@@ -1,23 +1,28 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
 )
 
 const (
-	SEGMENT_SIZE_EVEN        int8   = 4
-	SEGMENT_SIZE_ODD         int8   = 3
+	SEGMENT_SIZE             int8   = 6
+	SEGEMENT_MIN_FILE_SIZE   int64  = 1024
+	SEGMENT_MAGIC_BYTES      string = "BLACKBOX"
 	SEGEMENT_STORE_DIRECTORY string = "segments"
+	JOINT_STORE_DIRECTORY    string = "made"
 	SEGEMENT_EXT             string = ".bl"
 )
 
 type Segment struct {
-	fileSize        int64
+	contentSize     int64
 	createdAt       string
 	filehash        string
 	fileDestination string
@@ -31,56 +36,89 @@ type SegmentFileMetadata struct {
 	parentFilehash      string
 	parentFileSize      int64
 	segmentCount        int8
+	allSegments         []Segment
 }
 
-func segmentFile(filePath string) error {
+func segmentFile(filePath string) (*SegmentFileMetadata, error) {
 
 	fileInfo, err := os.Stat(filePath)
 
+	log.Println("total file size: ", fileInfo.Size())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fileBytes, err := os.ReadFile(filePath)
+	parentFileBytes, err := os.ReadFile(filePath)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	var segmentCount int8
-
-	if fileInfo.Size()%2 == 0 {
-		segmentCount = SEGMENT_SIZE_EVEN
-	} else {
-		segmentCount = SEGMENT_SIZE_ODD
-	}
-
-	segmentFileSize := fileInfo.Size() / int64(segmentCount)
+	segmentFileSize := fileInfo.Size() / int64(SEGMENT_SIZE)
 
 	log.Println("Segement file size: ", segmentFileSize)
 
-	saveFileBuffer := make([]byte, segmentFileSize)
+	saveFileMul := segmentFileSize / SEGEMENT_MIN_FILE_SIZE
+
+	saveFileBuffer := make([]byte, (SEGEMENT_MIN_FILE_SIZE * (saveFileMul + 1)))
+
+	log.Println("Save buffer size:", len(saveFileBuffer))
 
 	f, err := os.Open(filePath)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer f.Close()
 
-	for i := range segmentCount {
-		_, err = f.ReadAt(saveFileBuffer, segmentFileSize*int64(i))
+	allSegmentFiles := make([]Segment, SEGMENT_SIZE)
+
+	for i := range SEGMENT_SIZE {
+		n, err := f.ReadAt(saveFileBuffer, int64(len(saveFileBuffer))*int64(i))
 
 		if err != nil {
-			log.Panicln("Something went wrong while segementing file: ", err.Error())
+			if err == io.EOF {
+				log.Println("Content finished... proceding with 0's")
+			} else {
+				log.Println("Something went wrong with segmenting file:", err.Error(), "index:", i)
+			}
 		}
 
-		log.Println("Segment file num: ", i, "and content: ", saveFileBuffer[0])
-		transfromSegmentBl(saveFileBuffer, segmentFileSize, fileBytes, i)
+		// log.Println("Segment file num: ", i, "and content: ", saveFileBuffer[0], "readBute size:", n)
+		seg, err := transfromSegmentBl(saveFileBuffer, int64(n), parentFileBytes, i)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allSegmentFiles[i] = *seg
 	}
 
-	return nil
+	var parentFileExt string
+
+	for i, ch := range fileInfo.Name() {
+		if ch == '.' {
+			parentFileExt = fileInfo.Name()[i:]
+			break
+		}
+	}
+
+	log.Println(parentFileExt)
+
+	parentFileHash := sha256.Sum256(parentFileBytes)
+
+	parentFileString := hex.EncodeToString(parentFileHash[:])
+
+	segParent := SegmentFileMetadata{
+		parentFileName:      fileInfo.Name(),
+		parentFileExtention: parentFileExt,
+		parentFilehash:      parentFileString,
+		parentFileSize:      fileInfo.Size(),
+		segmentCount:        SEGMENT_SIZE,
+		allSegments:         allSegmentFiles,
+	}
+	return &segParent, nil
 }
 
 func transfromSegmentBl(
@@ -92,7 +130,11 @@ func transfromSegmentBl(
 
 	//check if the segment store folder is avaliable or not
 	if _, err := os.Stat(SEGEMENT_STORE_DIRECTORY); err != nil {
-		os.Mkdir(SEGEMENT_STORE_DIRECTORY, os.ModeDir)
+		err = os.Mkdir(SEGEMENT_STORE_DIRECTORY, os.ModeDir)
+		if err != nil {
+			log.Println("Cannot make directory:", err.Error())
+			return nil, err
+		}
 	}
 
 	//convert segmented byte to its corrosponding hash string
@@ -115,6 +157,13 @@ func transfromSegmentBl(
 	parentFilehashString := hex.EncodeToString(parentFileHash[:])
 	createdAt := time.Now().Format(time.UnixDate)
 
+	_, err = segf.WriteString(SEGMENT_MAGIC_BYTES)
+
+	if err != nil {
+		os.Remove(segStorePath)
+		return nil, err
+	}
+
 	segMetadata := "!METADATA:%" + "parentFilehash=" + parentFilehashString + "childContentHash=" + seghashedName + "segFileSize:" + fmt.Sprint(segmentSize) + "segmentNumber: " + fmt.Sprint(segmentNum) + "createdAt:" + createdAt + "%"
 
 	_, err = segf.WriteString(segMetadata)
@@ -130,7 +179,7 @@ func transfromSegmentBl(
 		return nil, err
 	}
 
-	//oofset for the segmented byte that where it should start storing
+	//offset for the segmented byte that where it should start storing
 	contentOffset := len([]byte(segMetadata)) + len("!BYTE:")
 
 	_, err = segf.WriteAt(segBytes, int64(contentOffset))
@@ -142,7 +191,7 @@ func transfromSegmentBl(
 
 	//return all info about the corrosponding segment
 	segment := Segment{
-		fileSize:        segmentSize,
+		contentSize:     segmentSize,
 		createdAt:       createdAt,
 		filehash:        seghashedName,
 		fileDestination: segStorePath,
@@ -152,4 +201,107 @@ func transfromSegmentBl(
 
 	return &segment, nil
 
+}
+
+func jointBLFiles(segFileData SegmentFileMetadata) {
+
+	parentFileName := segFileData.parentFileName
+
+	if _, err := os.Stat(JOINT_STORE_DIRECTORY); err != nil {
+		err = os.Mkdir(JOINT_STORE_DIRECTORY, os.ModeDir)
+		if err != nil {
+			log.Println("Cannot make directory:", err.Error())
+			return
+		}
+	}
+
+	saveFilePath := JOINT_STORE_DIRECTORY + "/" + parentFileName
+
+	parentFile, err := os.Create(saveFilePath)
+
+	if err != nil {
+		log.Println("Cannot make directory:", err.Error())
+		return
+	}
+
+	defer parentFile.Close()
+
+	var contentOffset int64 = 0
+
+	for i := range len(segFileData.allSegments) {
+		content, err := getContent(segFileData.allSegments[i].fileDestination,
+			segFileData.allSegments[i].contentSize)
+
+		if err != nil {
+			log.Println("Something went wrong while getting segment content:", err.Error())
+			break
+		}
+		_, err = parentFile.WriteAt(content, contentOffset)
+
+		contentOffset = contentOffset + segFileData.allSegments[i].contentSize
+
+		if err != nil {
+			log.Println("Something went wrong while writing the content bytes:", err.Error())
+			return
+		}
+	}
+
+	parentInfo, err := os.Stat(saveFilePath)
+
+	if err != nil {
+		log.Println("Cannot find file:", err.Error())
+		return
+	}
+
+	if segFileData.parentFileSize == parentInfo.Size() {
+		log.Println("ParentFile restored")
+	} else {
+		log.Println("😭")
+		log.Println(segFileData.parentFileSize)
+		log.Println(parentInfo.Size())
+	}
+
+}
+
+func getContent(filePath string, contentSize int64) ([]byte, error) {
+
+	if filePath[(len(filePath)-3):] != ".bl" {
+		return nil, errors.New("this is not a valid segFile")
+	}
+
+	segFile, err := os.Open(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer segFile.Close()
+
+	segInfo, err := os.Stat(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	segFileCotent := make([]byte, segInfo.Size())
+
+	_, err = segFile.Read(segFileCotent)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	index := bytes.Index(segFileCotent, []byte("BYTE:"))
+
+	content := make([]byte, contentSize)
+
+	offSet := (int64(index) + int64(len([]byte("BYTE:"))))
+
+	_, err = segFile.ReadAt(content, offSet)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
 }
