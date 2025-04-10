@@ -181,3 +181,23 @@ func (t *Tunnel) NewContent(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
+
+func (t *Tunnel) GetAllContent(w http.ResponseWriter, r *http.Request) {
+
+	contents, err := t.SqlDb.GetAllContent()
+
+	tr := TunnerResponse{
+		W: w,
+	}
+
+	if err != nil {
+		tr.ResponseWithError(STATUS_RESPONSE_ERROR, err.Error())
+		return
+	}
+
+	tr.ResponseWithJson(STATUS_RESPONSE_OK, struct {
+		AllContents []TunnelContent `json:"allContents"`
+	}{
+		AllContents: contents,
+	})
+}

@@ -168,5 +168,67 @@ func (sqlDb *SqlDb) InsertNewContentInformation(tunnelContent *TunnelContent) er
 	}
 
 	return nil
+}
 
+func (sqlDb *SqlDb) GetContentDetails(contentId string) (*TunnelContent, error) {
+
+	contentDetails := `SELECT * FROM content WHERE id = ?`
+
+	res, err := sqlDb.Db.Query(contentDetails, contentId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var id, uid, fileName, fileSize, fileImage, fileHash string
+
+	for res.Next() {
+		err := res.Scan(&id, &uid, &fileName, &fileSize, &fileImage, &fileHash)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	tunnelContent := TunnelContent{
+		Cid:       uuid.MustParse(id),
+		Uid:       uuid.MustParse(uid),
+		FileName:  fileName,
+		FileSize:  fileSize,
+		FileImage: fileImage,
+		FileHash:  fileHash,
+	}
+
+	return &tunnelContent, nil
+
+}
+
+func (sqlDb *SqlDb) GetAllContent() ([]TunnelContent, error) {
+
+	allContent := `SELECT * FROM content;`
+
+	res, err := sqlDb.Db.Query(allContent)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var contents []TunnelContent
+	var id, uid, fileName, fileSize, fileImage, fileHash string
+
+	for res.Next() {
+		res.Scan(&id, &uid, &fileName, &fileSize, &fileImage, &fileHash)
+
+		contents = append(contents, TunnelContent{
+			Cid:       uuid.MustParse(id),
+			Uid:       uuid.MustParse(uid),
+			FileName:  fileName,
+			FileSize:  fileSize,
+			FileImage: fileImage,
+			FileHash:  fileHash,
+		})
+
+	}
+
+	return contents, nil
 }

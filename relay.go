@@ -97,3 +97,64 @@ func (t *Tunnel) OnlineStatusHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
+
+func (t *Tunnel) SendFileRequestToSeeder(w http.ResponseWriter, r *http.Request) {
+
+	uid := r.URL.Query().Get("Uid")
+
+	cid := r.URL.Query().Get("Cid")
+
+	tr := TunnerResponse{
+		W: w,
+	}
+
+	if uid == "" || cid == "" {
+		tr.ResponseWithError(STATUS_RESPONSE_ERROR, "Please give uid and cid")
+		return
+	}
+
+	seederChannel := make(map[string]*TunnelClient)
+
+	relayConn, err := relayUgrader.Upgrade(w, r, nil)
+
+	if err != nil {
+		tr.ResponseWithError(STATUS_RESPONSE_ERROR, err.Error())
+		return
+	}
+
+	mu.Lock()
+	seederChannel[uid] = &TunnelClient{
+		Id:   uid,
+		Conn: relayConn,
+	}
+	mu.Unlock()
+
+	defer relayConn.Close()
+
+	tunnelContentDetails, err := t.SqlDb.GetContentDetails(cid)
+
+	if err != nil {
+		tr.ResponseWithError(STATUS_RESPONSE_ERROR, err.Error())
+		return
+	}
+
+	for c := range tunnelClients {
+
+		if c == tunnelContentDetails.Uid.String() {
+
+			mu.Lock()
+			seederChannel[tunnelContentDetails.Uid.String()] = &TunnelClient{
+				Id:   tunnelContentDetails.Uid.String(),
+				Conn: relayConn,
+			}
+			mu.Unlock()
+
+			//TODO : implement the whole thing
+
+		} else {
+			tr.ResponseWithError(STATUS_RESPONSE_ERROR, fmt.Sprintf("%s is not online", uid))
+			return
+		}
+	}
+
+}
