@@ -12,25 +12,25 @@ import (
 	"time"
 )
 
-type Segment struct {
-	contentSize     int64
-	createdAt       string
-	filehash        string
-	fileDestination string
-	comparitionHash string
-	segmentNumber   int8
+type TunnelSegment struct {
+	ContentSize     int64
+	CreatedAt       string
+	Filehash        string
+	FileDestination string
+	ComparitionHash string
+	SegmentNumber   int8
 }
 
-type SegmentFileMetadata struct {
-	parentFileName      string
-	parentFileExtention string
-	parentFilehash      string
-	parentFileSize      int64
-	segmentCount        int8
-	allSegments         []Segment
+type TunnelSegmentFileMetadata struct {
+	ParentFileName      string
+	ParentFileExtention string
+	ParentFilehash      string
+	ParentFileSize      int64
+	SegmentCount        int8
+	AllSegments         []TunnelSegment
 }
 
-func segmentFile(filePath string) (*SegmentFileMetadata, error) {
+func segmentFile(filePath string) (*TunnelSegmentFileMetadata, error) {
 
 	fileInfo, err := os.Stat(filePath)
 
@@ -63,7 +63,7 @@ func segmentFile(filePath string) (*SegmentFileMetadata, error) {
 
 	defer f.Close()
 
-	allSegmentFiles := make([]Segment, SEGMENT_SIZE)
+	allSegmentFiles := make([]TunnelSegment, SEGMENT_SIZE)
 
 	for i := range SEGMENT_SIZE {
 		n, err := f.ReadAt(saveFileBuffer, int64(len(saveFileBuffer))*int64(i))
@@ -77,7 +77,7 @@ func segmentFile(filePath string) (*SegmentFileMetadata, error) {
 		}
 
 		// log.Println("Segment file num: ", i, "and content: ", saveFileBuffer[0], "readBute size:", n)
-		seg, err := transfromSegmentBl(saveFileBuffer, int64(n), parentFileBytes, i)
+		seg, err := TransfromSegmentBl(saveFileBuffer, int64(n), parentFileBytes, i)
 
 		if err != nil {
 			return nil, err
@@ -101,23 +101,23 @@ func segmentFile(filePath string) (*SegmentFileMetadata, error) {
 
 	parentFileString := hex.EncodeToString(parentFileHash[:])
 
-	segParent := SegmentFileMetadata{
-		parentFileName:      fileInfo.Name(),
-		parentFileExtention: parentFileExt,
-		parentFilehash:      parentFileString,
-		parentFileSize:      fileInfo.Size(),
-		segmentCount:        SEGMENT_SIZE,
-		allSegments:         allSegmentFiles,
+	segParent := TunnelSegmentFileMetadata{
+		ParentFileName:      fileInfo.Name(),
+		ParentFileExtention: parentFileExt,
+		ParentFilehash:      parentFileString,
+		ParentFileSize:      fileInfo.Size(),
+		SegmentCount:        SEGMENT_SIZE,
+		AllSegments:         allSegmentFiles,
 	}
 	return &segParent, nil
 }
 
-func transfromSegmentBl(
+func TransfromSegmentBl(
 	segBytes []byte,
 	segmentSize int64,
 	parentFileByte []byte,
 	segmentNum int8,
-) (*Segment, error) {
+) (*TunnelSegment, error) {
 
 	//check if the segment store folder is avaliable or not
 	if _, err := os.Stat(SEGEMENT_STORE_DIRECTORY); err != nil {
@@ -181,22 +181,22 @@ func transfromSegmentBl(
 	}
 
 	//return all info about the corrosponding segment
-	segment := Segment{
-		contentSize:     segmentSize,
-		createdAt:       createdAt,
-		filehash:        seghashedName,
-		fileDestination: segStorePath,
-		segmentNumber:   segmentNum,
-		comparitionHash: parentFilehashString,
+	segment := TunnelSegment{
+		ContentSize:     segmentSize,
+		CreatedAt:       createdAt,
+		Filehash:        seghashedName,
+		FileDestination: segStorePath,
+		SegmentNumber:   segmentNum,
+		ComparitionHash: parentFilehashString,
 	}
 
 	return &segment, nil
 
 }
 
-func jointBLFiles(segFileData SegmentFileMetadata) {
+func jointBLFiles(segFileData TunnelSegmentFileMetadata) {
 
-	parentFileName := segFileData.parentFileName
+	parentFileName := segFileData.ParentFileName
 
 	if _, err := os.Stat(JOINT_STORE_DIRECTORY); err != nil {
 		err = os.Mkdir(JOINT_STORE_DIRECTORY, os.ModeDir)
@@ -219,9 +219,9 @@ func jointBLFiles(segFileData SegmentFileMetadata) {
 
 	var contentOffset int64 = 0
 
-	for i := range len(segFileData.allSegments) {
-		content, err := getContent(segFileData.allSegments[i].fileDestination,
-			segFileData.allSegments[i].contentSize)
+	for i := range len(segFileData.AllSegments) {
+		content, err := GetContent(segFileData.AllSegments[i].FileDestination,
+			segFileData.AllSegments[i].ContentSize)
 
 		if err != nil {
 			log.Println("Something went wrong while getting segment content:", err.Error())
@@ -229,7 +229,7 @@ func jointBLFiles(segFileData SegmentFileMetadata) {
 		}
 		_, err = parentFile.WriteAt(content, contentOffset)
 
-		contentOffset = contentOffset + segFileData.allSegments[i].contentSize
+		contentOffset = contentOffset + segFileData.AllSegments[i].ContentSize
 
 		if err != nil {
 			log.Println("Something went wrong while writing the content bytes:", err.Error())
@@ -244,17 +244,17 @@ func jointBLFiles(segFileData SegmentFileMetadata) {
 		return
 	}
 
-	if segFileData.parentFileSize == parentInfo.Size() {
+	if segFileData.ParentFileSize == parentInfo.Size() {
 		log.Println("ParentFile restored")
 	} else {
 		log.Println("😭")
-		log.Println(segFileData.parentFileSize)
+		log.Println(segFileData.ParentFileSize)
 		log.Println(parentInfo.Size())
 	}
 
 }
 
-func getContent(filePath string, contentSize int64) ([]byte, error) {
+func GetContent(filePath string, contentSize int64) ([]byte, error) {
 
 	if filePath[(len(filePath)-3):] != ".bl" {
 		return nil, errors.New("this is not a valid segFile")
