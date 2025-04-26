@@ -1,1 +1,1 @@
-go build . && Major.exe
+go build . && tracker.exe

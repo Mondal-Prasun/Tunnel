@@ -197,7 +197,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	rFile, err := os.Open(TRACKER_FILE_NAME)
 
 	if err != nil {
-		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while:%s", err.Error()))
+		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while1:%s", err.Error()))
 		return
 	}
 
@@ -210,7 +210,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	err = rDecoder.Decode(&trackerDetails)
 
 	if err != nil {
-		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while:%s", err.Error()))
+		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while2:%s", err.Error()))
 		return
 	}
 

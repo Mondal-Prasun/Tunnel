@@ -10,7 +10,7 @@ func testFunction() {
 	parentFile := "storage/blossom.mp4"
 	madeFile := "made/blossom.mp4"
 
-	tfm, err := segmentFile(parentFile)
+	tfm, err := SegmentFile(parentFile)
 
 	if err != nil {
 		log.Panicln("Error:", err.Error())

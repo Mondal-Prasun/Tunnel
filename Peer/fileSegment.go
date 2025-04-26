@@ -30,7 +30,7 @@ type TunnelSegmentFileMetadata struct {
 	AllSegments         []TunnelSegment
 }
 
-func segmentFile(filePath string) (*TunnelSegmentFileMetadata, error) {
+func SegmentFile(filePath string) (*TunnelSegmentFileMetadata, error) {
 
 	fileInfo, err := os.Stat(filePath)
 
@@ -151,7 +151,6 @@ func TransfromSegmentBl(
 	// {
 	///MARK:Please dont play with it
 
-	
 	// 	// _, err = segf.WriteString(SEGMENT_MAGIC_BYTES)
 
 	// 	// if err != nil {
