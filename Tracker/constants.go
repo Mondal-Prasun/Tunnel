@@ -52,3 +52,9 @@ const (
 	STATUS_RESPONSE_SERVER_ERROR int    = 500
 	SERVER_PORT                  string = ":8080"
 )
+
+//Tracker json File Constants
+
+const (
+	TRACKER_FILE_NAME string = "tracker.json"
+)

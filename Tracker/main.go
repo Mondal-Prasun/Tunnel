@@ -8,7 +8,7 @@ import (
 func main() {
 	log.Println("Start")
 
-	testFunction()
+	// testFunction()
 
 	sDb, err := initDataBase()
 
@@ -28,6 +28,7 @@ func main() {
 	tunnelMux.HandleFunc("/health", tunnel.HealthCheck)
 	tunnelMux.HandleFunc("/signUp", tunnel.SignupUser)
 	tunnelMux.HandleFunc("/login", tunnel.LoginUser)
+	tunnelMux.HandleFunc("/announce", tunnel.NewContentAnnounce)
 
 	log.Println("Server started at:", SERVER_PORT)
 

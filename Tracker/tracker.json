@@ -1,0 +1,36 @@
+[
+ {
+  "fileHash": "hash",
+  "fileSegments": [
+   {
+    "fileSegmentHash": "h1",
+    "fileAddress": [
+     ""
+    ]
+   },
+   {
+    "fileSegmentHash": "h2",
+    "fileAddress": [
+     ""
+    ]
+   }
+  ]
+ },
+ {
+  "fileHash": "hash",
+  "fileSegments": [
+   {
+    "fileSegmentHash": "h1",
+    "fileAddress": [
+     ""
+    ]
+   },
+   {
+    "fileSegmentHash": "h2",
+    "fileAddress": [
+     ""
+    ]
+   }
+  ]
+ }
+]

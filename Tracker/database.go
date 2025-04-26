@@ -141,14 +141,14 @@ func (sqlDb *SqlDb) QueryUser(userName string) (*TunnelUser, error) {
 // 	fileHash TEXT NOT NULL,
 //     FOREIGN KEY (uid) REFERENCES user(id));`
 
-type TunnelContent struct {
-	Cid       uuid.UUID `json:"id"`
-	Uid       uuid.UUID `json:"uid"`
-	FileName  string    `json:"fileName"`
-	FileSize  string    `json:"fileSize"`
-	FileImage string    `json:"fileImage"`
-	FileHash  string    `json:"fileHash"`
-}
+// type TunnelContent struct {
+// 	Cid       uuid.UUID `json:"id"`
+// 	Uid       uuid.UUID `json:"uid"`
+// 	FileName  string    `json:"fileName"`
+// 	FileSize  string    `json:"fileSize"`
+// 	FileImage string    `json:"fileImage"`
+// 	FileHash  string    `json:"fileHash"`
+// }
 
 func (sqlDb *SqlDb) InsertNewContentInformation(tunnelContent *TunnelContent) error {
 
