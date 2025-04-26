@@ -148,12 +148,18 @@ func TransfromSegmentBl(
 	parentFilehashString := hex.EncodeToString(parentFileHash[:])
 	createdAt := time.Now().Format(time.UnixDate)
 
-	_, err = segf.WriteString(SEGMENT_MAGIC_BYTES)
+	// {
+	///MARK:Please dont play with it
 
-	if err != nil {
-		os.Remove(segStorePath)
-		return nil, err
-	}
+	
+	// 	// _, err = segf.WriteString(SEGMENT_MAGIC_BYTES)
+
+	// 	// if err != nil {
+	// 	// 	os.Remove(segStorePath)
+	// 	// 	return nil, err
+	// 	// }
+
+	// }
 
 	segMetadata := "!METADATA:%" + "parentFilehash=" + parentFilehashString + "childContentHash=" + seghashedName + "segFileSize:" + fmt.Sprint(segmentSize) + "segmentNumber: " + fmt.Sprint(segmentNum) + "createdAt:" + createdAt + "%"
 
@@ -194,7 +200,7 @@ func TransfromSegmentBl(
 
 }
 
-func jointBLFiles(segFileData TunnelSegmentFileMetadata) {
+func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 
 	parentFileName := segFileData.ParentFileName
 

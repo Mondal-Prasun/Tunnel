@@ -8,6 +8,8 @@ import (
 func main() {
 	log.Println("Start")
 
+	testFunction()
+
 	sDb, err := initDataBase()
 
 	if err != nil {
@@ -26,9 +28,6 @@ func main() {
 	tunnelMux.HandleFunc("/health", tunnel.HealthCheck)
 	tunnelMux.HandleFunc("/signUp", tunnel.SignupUser)
 	tunnelMux.HandleFunc("/login", tunnel.LoginUser)
-	tunnelMux.HandleFunc("/relay", tunnel.RelaySocketHandler)
-	tunnelMux.HandleFunc("/clients", tunnel.OnlineStatusHandler)
-	tunnelMux.HandleFunc("/newContent", tunnel.NewContent)
 
 	log.Println("Server started at:", SERVER_PORT)
 
