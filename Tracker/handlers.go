@@ -44,7 +44,7 @@ func (t *Tunnel) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Checking health")
 
-	tr := TunnerResponse{
+	tr := TunnelResponse{
 		W: w,
 	}
 
@@ -63,7 +63,7 @@ func (t *Tunnel) SignupUser(w http.ResponseWriter, r *http.Request) {
 		UserImage string `json:"userImage"`
 	}{}
 
-	tr := TunnerResponse{
+	tr := TunnelResponse{
 		W: w,
 	}
 
@@ -109,7 +109,7 @@ func (t *Tunnel) LoginUser(w http.ResponseWriter, r *http.Request) {
 		UserName string `json:"userName"`
 		Password string `json:"password"`
 	}{}
-	tr := TunnerResponse{
+	tr := TunnelResponse{
 		W: w,
 	}
 
@@ -163,7 +163,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		FileSegmentsHash []string `json:"fileSegmentsHash"`
 	}{}
 
-	tr := TunnerResponse{
+	tr := TunnelResponse{
 		W: w,
 	}
 
@@ -181,16 +181,16 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	tunnelContent := &TunnelContent{
-		Cid:              uuid.New(),
-		Uid:              uuid.New(),
-		FileName:         body.FileName,
-		FileSize:         body.FileSize,
-		FileImage:        body.FileImage,
-		FileHash:         body.FileHash,
-		UAddress:         body.UAddress,
-		FileSegmentsHash: body.FileSegmentsHash,
-	}
+	// tunnelContent := &TunnelContent{
+	// 	Cid:              uuid.New(),
+	// 	Uid:              uuid.New(),
+	// 	FileName:         body.FileName,
+	// 	FileSize:         body.FileSize,
+	// 	FileImage:        body.FileImage,
+	// 	FileHash:         body.FileHash,
+	// 	UAddress:         body.UAddress,
+	// 	FileSegmentsHash: body.FileSegmentsHash,
+	// }
 
 	mu.Lock()
 
@@ -214,6 +214,20 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	alreadyExcist := false
+
+	for _, td := range trackerDetails {
+		if td.FileHash == body.FileHash {
+			alreadyExcist = true
+			break
+		}
+	}
+
+	if alreadyExcist {
+		tr.ResponseWithError(503, fmt.Sprintf("%s :already excist", body.FileHash))
+		return
+	}
+
 	tFile, err := os.Create(TRACKER_FILE_NAME)
 	if err != nil {
 		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while:%s", err.Error()))
@@ -230,7 +244,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trackerCon := &TunnelTracerContent{
-		FileHash:         tunnelContent.FileHash,
+		FileHash:         body.FileHash,
 		AllFileSegements: segmentFileAddress,
 	}
 
@@ -265,22 +279,13 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (t *Tunnel) GetAllContent(w http.ResponseWriter, r *http.Request) {
+func (t *Tunnel) GetTrackerFile(w http.ResponseWriter, r *http.Request) {
 
-	contents, err := t.SqlDb.GetAllContent()
+	mu.Lock()
+	defer mu.Unlock()
 
-	tr := TunnerResponse{
-		W: w,
-	}
+	w.Header().Set("Content-Disposition", "attachmet; filename=\"tracker.json\"")
+	w.Header().Set("Content-type", "application/octet-stream")
 
-	if err != nil {
-		tr.ResponseWithError(STATUS_RESPONSE_ERROR, err.Error())
-		return
-	}
-
-	tr.ResponseWithJson(STATUS_RESPONSE_OK, struct {
-		AllContents []TunnelContent `json:"allContents"`
-	}{
-		AllContents: contents,
-	})
+	http.ServeFile(w, r, TRACKER_FILE_NAME)
 }

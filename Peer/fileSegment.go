@@ -301,3 +301,13 @@ func GetContent(filePath string, contentSize int64) ([]byte, error) {
 
 	return content, nil
 }
+
+// func GetBlMetadata(filePath string) (interface{}, error) {
+
+// 	if filePath[(len(filePath)-3):] != ".bl" {
+// 		return nil, errors.New("this is not a valid segFile")
+// 	}
+
+// 	//Implement it later
+
+// }

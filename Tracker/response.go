@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-type TunnerResponse struct {
+type TunnelResponse struct {
 	W http.ResponseWriter
 }
 
-func (tr *TunnerResponse) ResponseWithJson(
+func (tr *TunnelResponse) ResponseWithJson(
 	statusCode int,
 	body interface{}) {
 
@@ -26,7 +26,7 @@ func (tr *TunnerResponse) ResponseWithJson(
 	tr.W.Write(data)
 }
 
-func (tr *TunnerResponse) ResponseWithError(statusCode int, errorMsg string) {
+func (tr *TunnelResponse) ResponseWithError(statusCode int, errorMsg string) {
 
 	err := struct {
 		ErrorMsg string `json:"errorMsg"`
@@ -35,4 +35,10 @@ func (tr *TunnerResponse) ResponseWithError(statusCode int, errorMsg string) {
 	}
 
 	tr.ResponseWithJson(statusCode, err)
+}
+
+func (tr *TunnelResponse) ResponseWithfFile(statusCode int, fileName string){
+
+
+
 }

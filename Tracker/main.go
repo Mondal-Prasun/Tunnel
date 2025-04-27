@@ -29,6 +29,7 @@ func main() {
 	tunnelMux.HandleFunc("/signUp", tunnel.SignupUser)
 	tunnelMux.HandleFunc("/login", tunnel.LoginUser)
 	tunnelMux.HandleFunc("/announce", tunnel.NewContentAnnounce)
+	tunnelMux.HandleFunc("/getTracker", tunnel.GetTrackerFile)
 
 	log.Println("Server started at:", SERVER_PORT)
 
