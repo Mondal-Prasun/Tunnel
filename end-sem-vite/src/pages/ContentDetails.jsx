@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 //downloading content ...
 import DownloadingGif from "../assets/searching.gif";
-import CompleteGif from "../assets/complete.gif";
+import CompleteGif from "../assets/success.gif";
 
 function ContentDetails() {
   const [open, setOpen] = useState(false);
