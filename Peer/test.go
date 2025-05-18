@@ -16,6 +16,10 @@ func testFunction() {
 		log.Panicln("Error:", err.Error())
 	}
 
+	for _, c := range tfm.AllSegments {
+		log.Println(c.FileDestination, "|", c.ContentSize)
+	}
+
 	JointBLFiles(tfm)
 
 	pb, err := os.ReadFile(parentFile)

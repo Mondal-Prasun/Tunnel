@@ -10,24 +10,11 @@ func main() {
 
 	// testFunction()
 
-	sDb, err := initDataBase()
-
-	if err != nil {
-		log.Panic("Cannot initilize database:", err.Error())
-		return
-	}
-
-	defer sDb.closeDataBase()
-
-	tunnel := Tunnel{
-		SqlDb: sDb,
-	}
+	tunnel := Tunnel{}
 
 	tunnelMux := http.NewServeMux()
 
 	tunnelMux.HandleFunc("/health", tunnel.HealthCheck)
-	tunnelMux.HandleFunc("/signUp", tunnel.SignupUser)
-	tunnelMux.HandleFunc("/login", tunnel.LoginUser)
 	tunnelMux.HandleFunc("/announce", tunnel.NewContentAnnounce)
 	tunnelMux.HandleFunc("/getTracker", tunnel.GetTrackerFile)
 

@@ -84,22 +84,45 @@ func announceFile(filePath string) {
 
 	}
 
+	pFileInfo, err := os.Stat(filePath)
+
+	if err != nil {
+		log.Println("Announce: ", err.Error())
+		return
+	}
+
+	// log.Println("Announce: ", tMeta.AllSegments[0].ContentSize)
+	//
+
+	var allSegments []SegDet
+
+	for _, s := range tMeta.AllSegments {
+		allSegments = append(allSegments, SegDet{
+			FileSegmentHash: s.Filehash,
+			SegmentNumber:   s.SegmentNumber,
+			ContentSize:     s.ContentSize,
+			SegFileSize:     s.FileSize,
+		})
+	}
+
 	data := struct {
-		Uid              string   `json:"uid"`
-		UAddress         string   `json:"uAddress"`
-		FileName         string   `json:"fileName"`
-		FileSize         string   `json:"fileSize"`
-		FileImage        string   `json:"fileImage"`
-		FileHash         string   `json:"fileHash"`
-		FileSegmentsHash []string `json:"fileSegmentsHash"`
+		UAddress        string   `json:"uAddress"`
+		FileName        string   `json:"fileName"`
+		FileSize        int64    `json:"fileSize"`
+		FileImage       string   `json:"fileImage"`
+		FileHash        string   `json:"fileHash"`
+		FileExt         string   `json:"fileExt"`
+		AllSegmentCount int8     `json:"allSegmentCount"`
+		FileSegments    []SegDet `json:"fileSegments"`
 	}{
-		Uid:              "",
-		UAddress:         PEER_ADDRESS,
-		FileName:         tMeta.ParentFileName,
-		FileSize:         "", //fix it later
-		FileImage:        "", //fix it later
-		FileHash:         tMeta.ParentFilehash,
-		FileSegmentsHash: segFileHash,
+		UAddress:        PEER_ADDRESS,
+		FileName:        tMeta.ParentFileName,
+		FileSize:        pFileInfo.Size(),
+		FileImage:       "", //fix it later
+		FileHash:        tMeta.ParentFilehash,
+		FileExt:         tMeta.ParentFileExtention,
+		AllSegmentCount: tMeta.SegmentCount,
+		FileSegments:    allSegments,
 	}
 
 	marshaledata, err := json.Marshal(data)
@@ -130,7 +153,6 @@ func announceFile(filePath string) {
 	log.Println(res.Body)
 
 	go getTrackerFile()
-
 }
 
 func listenToTheOtherPeers() {
@@ -203,13 +225,27 @@ func HandlePeerContections(conn net.Conn) {
 
 }
 
+type SegDet struct {
+	FileSegmentHash string `json:"fileSegmentHash"`
+	SegmentNumber   int8   `json:"segNum"`
+	ContentSize     int64  `json:"contentSize"`
+	SegFileSize     int64  `json:"segFileSize"`
+}
+
 type SegmentFileAddress struct {
 	FileSegmentHash string   `json:"fileSegmentHash"`
-	FileAddress     []string `json:"fileAddress"`
+	SegContentSize  int64    `json:"segContentSize"`
+	SegFileSize     int64    `json:"segFileSize"`
+	SegmentNumber   int8     `json:"SegmentNumber"`
+	SegAddress      []string `json:"segAddress"`
 }
 
 type TunnelTracerContent struct {
 	FileHash         string               `json:"fileHash"`
+	FileName         string               `json:"fileName"`
+	FileSize         int64                `json:"fileSize"`
+	AllSegmentCount  int8                 `json:"allSegmentCount"`
+	FileExt          string               `json:"fileExt"`
 	AllFileSegements []SegmentFileAddress `json:"fileSegments"`
 }
 
@@ -235,62 +271,39 @@ func requestSegments(parentFileHash string) error {
 		return err
 	}
 
-	var allSegmentsHash []string
+	//MARK:Change allSegmentHash and start from here
 
 	var segAdd []SegmentFileAddress
 
 	for _, trackerDet := range trackerDetails {
-
 		if trackerDet.FileHash == parentFileHash {
 			for _, segHash := range trackerDet.AllFileSegements {
-				allSegmentsHash = append(allSegmentsHash, segHash.FileSegmentHash)
 				segAdd = append(segAdd, segHash)
 			}
 		}
 	}
 
-	if len(allSegmentsHash) == 0 {
+	if len(segAdd) == 0 {
 		return fmt.Errorf("there is no file in the tracker")
 	}
 
-	neededSeg := checkIfPeerHasSeg(allSegmentsHash)
+	neededSeg := checkIfPeerHasSeg(segAdd)
 
 	if len(neededSeg) == 0 {
 		log.Println("All segments already excists")
 		return nil
 	}
-	// for _, nSeg := range neededSeg {
-	// 	log.Println(nSeg)
-	// }
 
-	var neededSegAdd []SegmentFileAddress
-
-	for _, seg := range neededSeg {
-		for _, segA := range segAdd {
-			if seg == segA.FileSegmentHash {
-				neededSegAdd = append(neededSegAdd, segA)
-			}
+	for _, nS := range neededSeg {
+		if nS.SegAddress[0] != PEER_ADDRESS {
+			go connecTopeer(nS)
 		}
 	}
-
-	// for _, a := range neededSegAdd {
-	// 	log.Println(a.FileAddress)
-	// }
-
-	// for {
-
-	for _, nS := range neededSegAdd {
-		if nS.FileAddress[0] != PEER_ADDRESS {
-			go connecTopeer(nS.FileAddress[0], nS.FileSegmentHash)
-		}
-	}
-	// time.Sleep(10 * time.Second)
-	// }
 
 	return nil
 }
 
-func checkIfPeerHasSeg(segMentsName []string) (neededSeg []string) {
+func checkIfPeerHasSeg(segMentsName []SegmentFileAddress) (neededSeg []SegmentFileAddress) {
 
 	dirEntry, err := os.ReadDir(SEGEMENT_STORE_DIRECTORY)
 
@@ -300,7 +313,7 @@ func checkIfPeerHasSeg(segMentsName []string) (neededSeg []string) {
 
 	}
 
-	var needSeg []string
+	var needSeg []SegmentFileAddress
 	// dirE.Name()[:(len(dirE.Name())-3)]
 
 	var fileName []string
@@ -309,16 +322,18 @@ func checkIfPeerHasSeg(segMentsName []string) (neededSeg []string) {
 		fileName = append(fileName, dirE.Name()[:(len(dirE.Name())-3)])
 	}
 
-	for _, segName := range segMentsName {
-		if !slices.Contains(fileName, segName) {
-			needSeg = append(needSeg, segName)
+	for _, seg := range segMentsName {
+		if !slices.Contains(fileName, seg.FileSegmentHash) {
+			needSeg = append(needSeg, seg)
 		}
 	}
 	return needSeg
 
 }
 
-func connecTopeer(add string, segId string) {
+func connecTopeer(segDet SegmentFileAddress) {
+
+	add := segDet.SegAddress[0]
 
 	conn, err := net.Dial("tcp", add)
 
@@ -329,33 +344,71 @@ func connecTopeer(add string, segId string) {
 
 	defer conn.Close()
 
-	req := fmt.Sprintf("REQUEST:%s\n", segId)
+	req := fmt.Sprintf("REQUEST:%s\n", segDet.FileSegmentHash)
 
 	conn.Write([]byte(req))
 
-	reader := bufio.NewReader(conn)
+	requestFeedBackReader := bufio.NewReader(conn)
 
-	header, err := reader.ReadString('\n')
+	headerFeedBack, err := requestFeedBackReader.ReadString('\n')
 
 	if err != nil {
 		fmt.Println("ConnectoPeer:", err.Error())
 		return
 	}
 
-	log.Println("peer: ", header)
+	// log.Println("peer: ", headerFeedBack)
 
-	idStr := strings.TrimPrefix(header, "CHUNK:")
+	idStr := strings.TrimPrefix(headerFeedBack, "CHUNK:")
 	log.Println("peer:", idStr)
 
-	reader2 := bufio.NewReader(conn)
+	segmentReader := bufio.NewReader(conn)
 
-	header2, err := reader2.ReadString('\n')
+	// segHeader, err := segmentReader.ReadString('\n')
+
+	// if err != nil {
+	// 	fmt.Println("ConnectoPeer:", err.Error())
+	// 	return
+	// }
+
+	// log.Println("peer: ", segHeader)
+
+	log.Println("ConnectTopeer: ", "SegSize: ", segDet.SegFileSize)
+
+	segReadBytes := make([]byte, segDet.SegFileSize)
+
+	_, err = io.ReadFull(segmentReader, segReadBytes)
 
 	if err != nil {
-		fmt.Println("ConnectoPeer:", err.Error())
+		log.Println("ConnectTopeer: ", err.Error())
 		return
 	}
 
-	log.Println("peer: ", header2)
+	// log.Printf("ConnectPeer :%x", segReadBytes[segLenght-1])
 
+	segPath := fmt.Sprintf("%s/%s.bl", SEGEMENT_STORE_DIRECTORY, segDet.FileSegmentHash)
+
+	seg, err := os.Create(segPath)
+
+	if err != nil {
+		log.Println("ConnetPeer :", err.Error())
+		return
+	}
+
+	defer seg.Close()
+
+	_, err = seg.Write(segReadBytes)
+
+	if err != nil {
+		log.Println("ConnectToPeer: ", err.Error())
+		return
+	}
+
+	size, _ := seg.Stat()
+
+	log.Println("ConnectToPeer :", segPath, " is written", "and size is: ", size.Size())
 }
+
+//[ ] make a separate method for tracker json parse
+//[ ] take all the .bl files and make the original file
+//[ ] bind with the wails framework

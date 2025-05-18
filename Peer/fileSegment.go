@@ -13,6 +13,7 @@ import (
 )
 
 type TunnelSegment struct {
+	FileSize        int64
 	ContentSize     int64
 	CreatedAt       string
 	Filehash        string
@@ -143,6 +144,8 @@ func TransfromSegmentBl(
 		return nil, err
 	}
 
+	defer segf.Close()
+
 	//writes all the neseccery data to the segmented file
 	parentFileHash := sha256.Sum256(parentFileByte)
 	parentFilehashString := hex.EncodeToString(parentFileHash[:])
@@ -185,8 +188,16 @@ func TransfromSegmentBl(
 		return nil, err
 	}
 
+	st, err := segf.Stat()
+
+	if err != nil {
+		log.Panic("TransFromBl: ", err.Error())
+	}
+	log.Println("TransfromBl: ", seghashedName, "|", "Original file Size: ", st.Size())
+
 	//return all info about the corrosponding segment
 	segment := TunnelSegment{
+		FileSize:        st.Size(),
 		ContentSize:     segmentSize,
 		CreatedAt:       createdAt,
 		Filehash:        seghashedName,
@@ -225,6 +236,9 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 	var contentOffset int64 = 0
 
 	for i := range len(segFileData.AllSegments) {
+
+		log.Println("JointBl: ", segFileData.AllSegments[i].SegmentNumber, "|", segFileData.AllSegments[i].ContentSize)
+
 		content, err := GetContent(segFileData.AllSegments[i].FileDestination,
 			segFileData.AllSegments[i].ContentSize)
 
