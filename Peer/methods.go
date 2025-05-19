@@ -249,13 +249,13 @@ type TunnelTracerContent struct {
 	AllFileSegements []SegmentFileAddress `json:"fileSegments"`
 }
 
-func requestSegments(parentFileHash string) error {
+func getTrackerContent() (trackerContent []TunnelTracerContent, err error) {
 
 	rFile, err := os.Open(TRACKER_PATH)
 
 	if err != nil {
-		log.Println("RequestSegments: ", err.Error())
-		return err
+		log.Println("GetTrackerContent: ", err.Error())
+		return nil, err
 	}
 
 	defer rFile.Close()
@@ -267,11 +267,21 @@ func requestSegments(parentFileHash string) error {
 	err = rDecoder.Decode(&trackerDetails)
 
 	if err != nil {
+		log.Println("GetTrackerContent: ", err.Error())
+		return nil, err
+	}
+
+	return trackerDetails, nil
+}
+
+func requestSegments(parentFileHash string) error {
+
+	trackerDetails, err := getTrackerContent()
+
+	if err != nil {
 		log.Println("RequestSegments: ", err.Error())
 		return err
 	}
-
-	//MARK:Change allSegmentHash and start from here
 
 	var segAdd []SegmentFileAddress
 
@@ -409,6 +419,53 @@ func connecTopeer(segDet SegmentFileAddress) {
 	log.Println("ConnectToPeer :", segPath, " is written", "and size is: ", size.Size())
 }
 
-//[ ] make a separate method for tracker json parse
+//[X] make a separate method for tracker json parse
 //[ ] take all the .bl files and make the original file
 //[ ] bind with the wails framework
+
+func makeOriginalFile(parentFileHash string) error {
+
+	allTracerContent, err := getTrackerContent()
+
+	if err != nil {
+		log.Println("MakeOriginalFile: ", err.Error())
+		return err
+	}
+
+	var getParentFileDetails TunnelTracerContent
+
+	for _, t := range allTracerContent {
+		if t.FileHash == parentFileHash {
+			getParentFileDetails = t
+		}
+	}
+
+	var segments []TunnelSegment
+
+	for _, s := range getParentFileDetails.AllFileSegements {
+		segments = append(segments, TunnelSegment{
+			FileSize:        s.SegFileSize,
+			ContentSize:     s.SegContentSize,
+			Filehash:        s.FileSegmentHash,
+			FileDestination: fmt.Sprintf("%s/%s.bl", SEGEMENT_STORE_DIRECTORY, s.FileSegmentHash),
+			SegmentNumber:   s.SegmentNumber,
+		})
+	}
+
+	metaData := &TunnelSegmentFileMetadata{
+		ParentFileName:      getParentFileDetails.FileName,
+		ParentFileExtention: getParentFileDetails.FileExt,
+		ParentFilehash:      getParentFileDetails.FileHash,
+		ParentFileSize:      getParentFileDetails.FileSize,
+		SegmentCount:        SEGMENT_SIZE,
+		AllSegments:         segments,
+	}
+
+	err = jointBLFiles(metaData)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

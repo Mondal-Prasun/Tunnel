@@ -20,7 +20,7 @@ func testFunction() {
 		log.Println(c.FileDestination, "|", c.ContentSize)
 	}
 
-	JointBLFiles(tfm)
+	jointBLFiles(tfm)
 
 	pb, err := os.ReadFile(parentFile)
 

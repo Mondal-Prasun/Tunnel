@@ -15,10 +15,8 @@ import (
 type TunnelSegment struct {
 	FileSize        int64
 	ContentSize     int64
-	CreatedAt       string
 	Filehash        string
 	FileDestination string
-	ComparitionHash string
 	SegmentNumber   int8
 }
 
@@ -199,18 +197,16 @@ func TransfromSegmentBl(
 	segment := TunnelSegment{
 		FileSize:        st.Size(),
 		ContentSize:     segmentSize,
-		CreatedAt:       createdAt,
 		Filehash:        seghashedName,
 		FileDestination: segStorePath,
 		SegmentNumber:   segmentNum,
-		ComparitionHash: parentFilehashString,
 	}
 
 	return &segment, nil
 
 }
 
-func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
+func jointBLFiles(segFileData *TunnelSegmentFileMetadata) (jointErr error) {
 
 	parentFileName := segFileData.ParentFileName
 
@@ -218,7 +214,7 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 		err = os.Mkdir(JOINT_STORE_DIRECTORY, os.ModeDir)
 		if err != nil {
 			log.Println("Cannot make directory:", err.Error())
-			return
+			return err
 		}
 	}
 
@@ -228,7 +224,7 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 
 	if err != nil {
 		log.Println("Cannot make directory:", err.Error())
-		return
+		return err
 	}
 
 	defer parentFile.Close()
@@ -244,7 +240,7 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 
 		if err != nil {
 			log.Println("Something went wrong while getting segment content:", err.Error())
-			break
+			return err
 		}
 		_, err = parentFile.WriteAt(content, contentOffset)
 
@@ -252,7 +248,7 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 
 		if err != nil {
 			log.Println("Something went wrong while writing the content bytes:", err.Error())
-			return
+			return err
 		}
 	}
 
@@ -260,17 +256,16 @@ func JointBLFiles(segFileData *TunnelSegmentFileMetadata) {
 
 	if err != nil {
 		log.Println("Cannot find file:", err.Error())
-		return
+		return err
 	}
 
 	if segFileData.ParentFileSize == parentInfo.Size() {
 		log.Println("ParentFile restored")
 	} else {
 		log.Println("😭")
-		log.Println(segFileData.ParentFileSize)
-		log.Println(parentInfo.Size())
 	}
 
+	return nil
 }
 
 func GetContent(filePath string, contentSize int64) ([]byte, error) {
