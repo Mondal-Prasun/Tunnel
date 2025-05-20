@@ -110,20 +110,20 @@ function Leecher() {
       description: "Description for content 16",
     },
   ];
-  const handleCall = async ()=> {
+  const handleCall = async () => {
     try {
-        console.log("Hello");
-        const tunnelTrackerContent = await ListenToPeers(port);
-      } catch (error) {
-        console.error("Error fetching tracker content:", error);
-      }
+      console.log("Hello");
+      const tunnelTrackerContent = await ListenToPeers(port);
+    } catch (error) {
+      console.error("Error fetching tracker content:", error);
+    }
   }
-  useEffect(()=> {
+  useEffect(() => {
     handleCall();
-    setTimeout(async ()=> {
+    setTimeout(async () => {
       handleCall();
     }, 5000)
-  },[])
+  }, [])
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
