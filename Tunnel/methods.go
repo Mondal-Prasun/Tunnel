@@ -161,7 +161,9 @@ func announceFile(filePath string, trackerUrl string) {
 
 func listenToTheOtherPeers(peerPort string) error {
 
-	peerAddrss := fmt.Sprintf("http://127.0.0.1:%s", peerPort)
+	peerAddrss := fmt.Sprintf("127.0.0.1:%s", peerPort)
+
+	log.Println("ListenToPeers: FinalPort->", peerAddrss)
 
 	listner, err := net.Listen("tcp", peerAddrss)
 
@@ -170,7 +172,7 @@ func listenToTheOtherPeers(peerPort string) error {
 		return err
 	}
 
-	log.Println("Peer listening on: ", PEER_ADDRESS)
+	log.Println("Peer listening on: ", peerAddrss)
 
 	defer listner.Close()
 

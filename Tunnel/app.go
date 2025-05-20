@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 )
 
 // App struct
@@ -37,7 +38,7 @@ func (a *App) FetchTrackerFile(url string) error {
 }
 
 func (a *App) ListenToPeers(port string) error {
-
+	log.Println("Listen: ", port)
 	go listenToTheOtherPeers(port)
 
 	return nil
