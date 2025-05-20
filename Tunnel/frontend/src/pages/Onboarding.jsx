@@ -26,7 +26,8 @@ function Onboarding() {
     try {
       console.log("Login data:", data);
       
-      const tunnelTrackerContent = await FetchTrackerFile(data.url);
+      await FetchTrackerFile(data.url);
+      await ListenToPeers(data.port);
       console.log("after ",data);
       
       if(true) {
