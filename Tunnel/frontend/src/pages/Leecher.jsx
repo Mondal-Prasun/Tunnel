@@ -1,5 +1,7 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
+import { useEffect } from "react";
+import { ListenToPeers } from "../../wailsjs/go/main/ListenToPeers";
 
 function Leecher() {
   const contents = [
@@ -107,6 +109,15 @@ function Leecher() {
       description: "Description for content 16",
     },
   ];
+  useEffect(()=> {
+    setTimeout(async ()=> {
+      try {
+        const tunnelTrackerContent = await ListenToPeers();
+      } catch (error) {
+        console.error("Error fetching tracker content:", error);
+      }
+    }, 10000)
+  },[])
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
