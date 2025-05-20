@@ -1,5 +1,6 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
+import { useEffect } from "react";
 
 function Leecher() {
   const contents = [
@@ -107,6 +108,11 @@ function Leecher() {
       description: "Description for content 16",
     },
   ];
+  useEffect(()=> {
+    setTimeout(()=> {
+      Promise.resolve(getTrackerFile()).catch((err)=> console.log("Error has occured", err))
+    }, 10000)
+  },[])
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">

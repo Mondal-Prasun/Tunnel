@@ -11,7 +11,8 @@ const schema = yup.object({
     .number()
     .required("Port is required")
     .typeError("Port must be a number")
-    .max(65535, "Port must be less than or equal to 65535"),
+    .min(6000, "Port must be greater than or equal to 6,000")
+    .max(10000, "Port must be less than or equal to 10,000"),
 });
 
 
@@ -20,8 +21,15 @@ function Onboarding() {
   const {handleSubmit, register, formState} = useForm({
     resolver: yupResolver(schema)
   });
-  const handleLogin = ()=> {
-    console.log("Login clicked");
+  const handleLogin = async() => {
+    try {
+      // const tunnelTrackerContent = await getTrackFile();
+      if(true) {
+        window.location.href = "/leech"
+      }
+    } catch (error) {
+      console.error("Error fetching tracker content:", error);
+    }
   }
   return (
     <>
@@ -102,6 +110,7 @@ function Onboarding() {
                   </div>
                   <Button
                     type="submit"
+                    onClick={handleLogin}
                     className="bg-gray-800 text-white cursor-pointer my-4 hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30"
                   >
                     Login
