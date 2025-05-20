@@ -1,9 +1,11 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
 import { useEffect } from "react";
-import { ListenToPeers } from "../../wailsjs/go/main/ListenToPeers";
+import { ListenToPeers } from "../../wailsjs/go/main/App.js";
+import { useParams } from "react-router-dom";
 
 function Leecher() {
+  const port = useParams();
   const contents = [
     {
       id: 1,
@@ -112,7 +114,7 @@ function Leecher() {
   useEffect(()=> {
     setTimeout(async ()=> {
       try {
-        const tunnelTrackerContent = await ListenToPeers();
+        const tunnelTrackerContent = await ListenToPeers(port);
       } catch (error) {
         console.error("Error fetching tracker content:", error);
       }
