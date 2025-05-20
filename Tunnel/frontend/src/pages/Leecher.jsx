@@ -1,6 +1,7 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
 import { useEffect } from "react";
+import { ListenToPeers } from "../../wailsjs/go/main/ListenToPeers";
 
 function Leecher() {
   const contents = [
@@ -109,8 +110,12 @@ function Leecher() {
     },
   ];
   useEffect(()=> {
-    setTimeout(()=> {
-      Promise.resolve(getTrackerFile()).catch((err)=> console.log("Error has occured", err))
+    setTimeout(async ()=> {
+      try {
+        const tunnelTrackerContent = await ListenToPeers();
+      } catch (error) {
+        console.error("Error fetching tracker content:", error);
+      }
     }, 10000)
   },[])
   return (
