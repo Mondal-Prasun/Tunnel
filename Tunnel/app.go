@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 )
 
 // App struct
@@ -22,6 +21,24 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+// func (a *App) Greet(name string) string {
+// 	return fmt.Sprintf("Hello %s, It's show time!", name)
+// }
+//
+
+func (a *App) FetchTrackerFile(url string) error {
+
+	err := getTrackerFile(url)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) ListenToPeers(port string) error {
+
+	go listenToTheOtherPeers(port)
+
+	return nil
 }
