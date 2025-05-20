@@ -1,7 +1,7 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
 import { useEffect } from "react";
-import { ListenToPeers } from "../../wailsjs/go/main/App.js";
+import { FetchTrackerFile } from "../../wailsjs/go/main/App.js";
 
 function Leecher() {
   const port = localStorage.getItem("port");
@@ -112,16 +112,18 @@ function Leecher() {
   ];
   const handleCall = async () => {
     try {
-      console.log("Hello");
-      const tunnelTrackerContent = await ListenToPeers(port);
+        console.log("Hello");
+        await FetchTrackerFile(port);
     } catch (error) {
       console.error("Error fetching tracker content:", error);
     }
   }
   useEffect(() => {
     handleCall();
+    const interval = setTimeout(async ()=> {
     setTimeout(async () => {
       handleCall();
+      return ()=> clearInterval(interval);
     }, 5000)
   }, [])
   return (

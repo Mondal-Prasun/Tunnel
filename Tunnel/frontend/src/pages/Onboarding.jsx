@@ -25,12 +25,11 @@ function Onboarding() {
   const handleLogin = async (data) => {
     try {
       console.log("Login data:", data);
+      await FetchTrackerFile(data.url);
+      await ListenToPeers(data.port);
+      console.log("after ",data);
 
-      const tunnelTrackerContent = await FetchTrackerFile(data.url);
-      await ListenToPeers("6002")
-      console.log("after ", data);
-
-      if (true) {
+      if (true){
         window.location.href = `/leech`
         localStorage.setItem("port", data.port);
       }
