@@ -110,14 +110,19 @@ function Leecher() {
       description: "Description for content 16",
     },
   ];
-  useEffect(()=> {
-    setTimeout(async ()=> {
-      try {
+  const handleCall = async ()=> {
+    try {
+        console.log("Hello");
         const tunnelTrackerContent = await ListenToPeers(port);
       } catch (error) {
         console.error("Error fetching tracker content:", error);
       }
-    }, 10000)
+  }
+  useEffect(()=> {
+    handleCall();
+    setTimeout(async ()=> {
+      handleCall();
+    }, 5000)
   },[])
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
