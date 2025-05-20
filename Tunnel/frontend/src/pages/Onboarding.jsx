@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FileTrackerFile } from "../../wailsjs/go/main/FileTrackerFile";
+import { FetchTrackerFile } from "../../wailsjs/go/main/App.js";
 
 const schema = yup.object({
   url: yup.string().url("Invalid URL").required("URL is required"),
@@ -22,11 +22,11 @@ function Onboarding() {
   const {handleSubmit, register, formState} = useForm({
     resolver: yupResolver(schema)
   });
-  const handleLogin = async() => {
+  const handleLogin = async(data) => {
     try {
-      const tunnelTrackerContent = await FileTrackerFile();
+      const tunnelTrackerContent = await FetchTrackerFile(data.url);
       if(true) {
-        window.location.href = "/leech"
+        window.location.href = `/leech/${data.url}`
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
