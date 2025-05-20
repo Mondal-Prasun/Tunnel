@@ -24,9 +24,14 @@ function Onboarding() {
   });
   const handleLogin = async(data) => {
     try {
+      console.log("Login data:", data);
+      
       const tunnelTrackerContent = await FetchTrackerFile(data.url);
+      console.log("after ",data);
+      
       if(true) {
-        window.location.href = `/leech/${data.url}`
+        window.location.href = `/leech`
+        localStorage.setItem("port", data.port);
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
