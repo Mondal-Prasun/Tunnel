@@ -16,27 +16,26 @@ const schema = yup.object({
     .max(10000, "Port must be less than or equal to 10,000"),
 });
 
-
 function Onboarding() {
   const [screen, setScreen] = useState("Home");
   const { handleSubmit, register, formState } = useForm({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
   const handleLogin = async (data) => {
     try {
-      console.log("Login data:", data);
+      console.log("Login data:", data.port);
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port);
-      console.log("after ",data);
+      console.log("after ", data);
 
-      if (true){
-        window.location.href = `/leech`
-        localStorage.setItem("port", data.port);
+      if (true) {
+        window.location.href = `/leech`;
+        localStorage.setItem("url", data.url);
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
     }
-  }
+  };
   return (
     <>
       <div className="flex h-screen">
@@ -75,7 +74,10 @@ function Onboarding() {
                       A chat app where you can have unlimited chats...
                     </p>
                   </div>
-                  <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-2">
+                  <form
+                    onSubmit={handleSubmit(handleLogin)}
+                    className="flex flex-col gap-2"
+                  >
                     <div className="flex flex-col gap-4">
                       <label htmlFor="url" className="text-gray-600">
                         Tracker URL
@@ -87,13 +89,11 @@ function Onboarding() {
                         defaultValue=""
                         {...register("url")}
                       />
-                      {
-                        formState.errors.url && (
-                          <p className="text-sm text-red-500">
-                            {formState.errors.url.message}
-                          </p>
-                        )
-                      }
+                      {formState.errors.url && (
+                        <p className="text-sm text-red-500">
+                          {formState.errors.url.message}
+                        </p>
+                      )}
                     </div>
                     <div className="flex relative flex-col gap-2">
                       <label htmlFor="password" className="text-gray-600">
@@ -106,13 +106,11 @@ function Onboarding() {
                         defaultValue=""
                         {...register("port")}
                       />
-                      {
-                        formState.errors.port && (
-                          <p className="text-sm text-red-500">
-                            {formState.errors.port.message}
-                          </p>
-                        )
-                      }
+                      {formState.errors.port && (
+                        <p className="text-sm text-red-500">
+                          {formState.errors.port.message}
+                        </p>
+                      )}
                     </div>
                     <Button
                       type="submit"
