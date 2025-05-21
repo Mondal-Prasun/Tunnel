@@ -23,6 +23,8 @@ export namespace main {
 	export class TunnelTracerContent {
 	    fileHash: string;
 	    fileName: string;
+	    fileImage: string;
+	    fileDescription: string;
 	    fileSize: number;
 	    allSegmentCount: number;
 	    fileExt: string;
@@ -36,6 +38,8 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.fileHash = source["fileHash"];
 	        this.fileName = source["fileName"];
+	        this.fileImage = source["fileImage"];
+	        this.fileDescription = source["fileDescription"];
 	        this.fileSize = source["fileSize"];
 	        this.allSegmentCount = source["allSegmentCount"];
 	        this.fileExt = source["fileExt"];
