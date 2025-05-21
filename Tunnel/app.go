@@ -40,11 +40,10 @@ func (a *App) FetchTrackerFile(url string) error {
 func (a *App) ListenToPeers(port string) error {
 	log.Println("Listen: ", port)
 	go listenToTheOtherPeers(port)
-
 	return nil
 }
 
-func (a *App) GetRequiredContent() []TunnelTracerContent {
+func (a *App) GetRequiredContent() ([]TunnelTracerContent, error) {
 
 	log.Println("GetRequiredContent: ", "Called")
 
@@ -52,11 +51,69 @@ func (a *App) GetRequiredContent() []TunnelTracerContent {
 
 	if err != nil {
 		log.Println("GetrequiredContent: ", err.Error())
-		return nil
+		return nil, err
 	}
 
 	log.Println("GetRequiredConent: ", content)
 
-	return content
+	return content, err
 
+}
+
+func (a *App) MakeRequiredFile() error {
+
+	errChan := make(chan error)
+	defer close(errChan)
+	go func() {
+		err := makeRequiredDirs()
+		errChan <- err
+	}()
+
+	if err := <-errChan; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) AnnounceCurrentFile(filePath string, fileImage string, fileDescription string, trackerUrl string) error {
+
+	err := announceFile(filePath, trackerUrl, fileImage, fileDescription)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) RequestRequiredSegments(parentFileHash string) error {
+
+	err := requestSegments(parentFileHash)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) CheckIfAllSegmentAreAvaliable(allSeg []SegmentFileAddress) ([]SegmentFileAddress, error) {
+
+	needSeg, err := checkIfPeerHasSeg(allSeg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return needSeg, nil
+}
+
+func (a *App) MakeOriginaleFile(parentFileHash string) error {
+	err := makeOriginalFile(parentFileHash)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }

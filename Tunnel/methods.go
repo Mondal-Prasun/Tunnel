@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func makeRequiredDirs() {
+func makeRequiredDirs() error {
 
 	allDir := []string{
 		JOINT_STORE_DIRECTORY,
@@ -27,13 +27,14 @@ func makeRequiredDirs() {
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			err := os.Mkdir(dir, os.ModeDir)
 			if err != nil {
-				log.Panic("Create Directory: ", err.Error())
+				log.Println("Create Directory: ", err.Error())
+				return err
 			}
 
 		}
 
 	}
-
+	return nil
 }
 
 func getTrackerFile(trackerUrl string) error {
@@ -71,13 +72,13 @@ func getTrackerFile(trackerUrl string) error {
 
 }
 
-func announceFile(filePath string, trackerUrl string, fileImage string, fileDescription string) {
+func announceFile(filePath string, trackerUrl string, fileImage string, fileDescription string) error {
 
 	tMeta, err := SegmentFile(filePath)
 
 	if err != nil {
 		log.Println("Announce: ", err.Error())
-		return
+		return err
 	}
 
 	var segFileHash []string
@@ -92,7 +93,7 @@ func announceFile(filePath string, trackerUrl string, fileImage string, fileDesc
 
 	if err != nil {
 		log.Println("Announce: ", err.Error())
-		return
+		return err
 	}
 
 	// log.Println("Announce: ", tMeta.AllSegments[0].ContentSize)
@@ -124,6 +125,7 @@ func announceFile(filePath string, trackerUrl string, fileImage string, fileDesc
 		FileName:        tMeta.ParentFileName,
 		FileSize:        pFileInfo.Size(),
 		FileImage:       fileImage, //fix it later
+		FileDescription: fileDescription,
 		FileHash:        tMeta.ParentFilehash,
 		FileExt:         tMeta.ParentFileExtention,
 		AllSegmentCount: tMeta.SegmentCount,
@@ -143,21 +145,33 @@ func announceFile(filePath string, trackerUrl string, fileImage string, fileDesc
 			}
 
 		}
-		return
+		return err
 	}
 
 	res, err := http.Post(fmt.Sprintf("%s/announce", TRACKER_URL), "application-json", bytes.NewBuffer(marshaledata))
 
 	if err != nil {
 		log.Println("Announce: ", err.Error())
-		return
+		return err
 	}
 
 	defer res.Body.Close()
 
 	log.Println(res.Body)
 
-	go getTrackerFile(trackerUrl)
+	errChan := make(chan error)
+
+	go func() {
+		err := getTrackerFile(trackerUrl)
+		errChan <- err
+
+	}()
+
+	if err := <-errChan; err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func listenToTheOtherPeers(peerPort string) error {
@@ -190,7 +204,7 @@ func listenToTheOtherPeers(peerPort string) error {
 	}
 }
 
-func HandlePeerContections(conn net.Conn) {
+func HandlePeerContections(conn net.Conn) error {
 
 	defer conn.Close()
 
@@ -203,7 +217,7 @@ func HandlePeerContections(conn net.Conn) {
 		log.Println("HandlePeer: ", reqString)
 
 		if err != nil {
-			return
+			return err
 		}
 
 		if strings.HasPrefix(reqString, "REQUEST:") {
@@ -219,13 +233,16 @@ func HandlePeerContections(conn net.Conn) {
 
 				if err != nil {
 					log.Println("Handlepeer: ", err.Error())
-					return
+					return err
 				}
 
 				log.Println(len(segBytes))
 
-				conn.Write(segBytes)
+				_, err = conn.Write(segBytes)
 
+				if err != nil {
+					return err
+				}
 			}
 
 		}
@@ -308,30 +325,43 @@ func requestSegments(parentFileHash string) error {
 		return fmt.Errorf("there is no file in the tracker")
 	}
 
-	neededSeg := checkIfPeerHasSeg(segAdd)
+	neededSeg, err := checkIfPeerHasSeg(segAdd)
+
+	if err != nil {
+		return err
+	}
 
 	if len(neededSeg) == 0 {
 		log.Println("All segments already excists")
-		return nil
+		return fmt.Errorf("All segments are already excists")
 	}
+
+	errChan := make(chan error)
+	defer close(errChan)
 
 	for _, nS := range neededSeg {
 		if nS.SegAddress[0] != PEER_ADDRESS {
-			go connecTopeer(nS)
+			go func() {
+				err := connecTopeer(nS)
+				errChan <- err
+			}()
 		}
 	}
 
+	if err := <-errChan; err != nil {
+		return err
+	}
 	return nil
 }
 
-func checkIfPeerHasSeg(segMentsName []SegmentFileAddress) (neededSeg []SegmentFileAddress) {
+func checkIfPeerHasSeg(segMentsName []SegmentFileAddress) (neededSeg []SegmentFileAddress, err error) {
 
 	dirEntry, err := os.ReadDir(SEGEMENT_STORE_DIRECTORY)
 
 	if err != nil {
 
-		log.Panic("CheckPeerSeg:", err.Error())
-
+		log.Println("CheckPeerSeg:", err.Error())
+		return nil, err
 	}
 
 	var needSeg []SegmentFileAddress
@@ -348,11 +378,11 @@ func checkIfPeerHasSeg(segMentsName []SegmentFileAddress) (neededSeg []SegmentFi
 			needSeg = append(needSeg, seg)
 		}
 	}
-	return needSeg
+	return needSeg, nil
 
 }
 
-func connecTopeer(segDet SegmentFileAddress) {
+func connecTopeer(segDet SegmentFileAddress) error {
 
 	add := segDet.SegAddress[0]
 
@@ -360,7 +390,7 @@ func connecTopeer(segDet SegmentFileAddress) {
 
 	if err != nil {
 		log.Println("ConnecToPeer:", add, " is not online")
-		return
+		return err
 	}
 
 	defer conn.Close()
@@ -375,7 +405,7 @@ func connecTopeer(segDet SegmentFileAddress) {
 
 	if err != nil {
 		fmt.Println("ConnectoPeer:", err.Error())
-		return
+		return err
 	}
 
 	// log.Println("peer: ", headerFeedBack)
@@ -402,7 +432,7 @@ func connecTopeer(segDet SegmentFileAddress) {
 
 	if err != nil {
 		log.Println("ConnectTopeer: ", err.Error())
-		return
+		return err
 	}
 
 	// log.Printf("ConnectPeer :%x", segReadBytes[segLenght-1])
@@ -413,7 +443,7 @@ func connecTopeer(segDet SegmentFileAddress) {
 
 	if err != nil {
 		log.Println("ConnetPeer :", err.Error())
-		return
+		return err
 	}
 
 	defer seg.Close()
@@ -422,17 +452,15 @@ func connecTopeer(segDet SegmentFileAddress) {
 
 	if err != nil {
 		log.Println("ConnectToPeer: ", err.Error())
-		return
+		return err
 	}
 
 	size, _ := seg.Stat()
 
 	log.Println("ConnectToPeer :", segPath, " is written", "and size is: ", size.Size())
-}
 
-//[X] make a separate method for tracker json parse
-//[ ] take all the .bl files and make the original file
-//[ ] bind with the wails framework
+	return nil
+}
 
 func makeOriginalFile(parentFileHash string) error {
 
