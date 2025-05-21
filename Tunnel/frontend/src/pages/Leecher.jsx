@@ -68,13 +68,13 @@ function Leecher() {
   ];
   const handleCall = async () => {
     try {
-      const data = await GetRequiredContent()
-      console.log(data)
+      const data = await GetRequiredContent();
+      await FetchTrackerFile(url);
+      console.log(data);
       setContents(data);
     } catch (e) {
       console.log(e)
     }
-
   };
   useEffect(() => {
     handleCall();
