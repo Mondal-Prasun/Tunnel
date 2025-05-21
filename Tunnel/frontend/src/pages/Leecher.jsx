@@ -66,21 +66,22 @@ function Leecher() {
       ],
     },
   ];
-  const handleCall = async (d) => {
+  const handleCall = async () => {
     try {
-      const data = await GetRequiredContent()
-      console.log(data)
+      const data = await GetRequiredContent();
+      await FetchTrackerFile(url);
+      console.log(data);
+      setContents(data);
     } catch (e) {
       console.log(e)
     }
-
   };
   useEffect(() => {
     handleCall();
-    // const interval = setInterval(() => {
-    //   handleCall();
-    // }, 5000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      handleCall();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
@@ -91,7 +92,7 @@ function Leecher() {
           alt="background-image"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent rounded-2xl"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
+        {/* <div className="absolute inset-0 flex items-center justify-center">
           <button
             className="bg-white/80 hover:bg-white text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
             onClick={handleCall} // Uncomment this line to connect to refresh logic
@@ -99,7 +100,7 @@ function Leecher() {
           >
             &#x21bb; Refresh
           </button>
-        </div>
+        </div> */}
       </section>
       <h1 className="font-semibold text-xl">Contents</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
