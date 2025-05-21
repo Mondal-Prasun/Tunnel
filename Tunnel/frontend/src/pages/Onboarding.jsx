@@ -32,7 +32,6 @@ function Onboarding() {
       await ListenToPeers(data.port.toString());
       console.log("after ", data);
       if (true) {
-        // window.location.href = `/leech`;
         navigate("/leech")
         localStorage.setItem("url", data.url);
       }

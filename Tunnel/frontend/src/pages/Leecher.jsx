@@ -1,9 +1,18 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
 import { useEffect, useState } from "react";
-import { FetchTrackerFile, ListenToPeers, GetRequiredContent } from "../../wailsjs/go/main/App.js";
+import {
+  FetchTrackerFile,
+  ListenToPeers,
+  GetRequiredContent,
+} from "../../wailsjs/go/main/App.js";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 function Leecher() {
+  const [open, setOpen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
   const url = localStorage.getItem("url");
   const [contents, setContents] = useState([]);
   const ok = [
@@ -73,7 +82,7 @@ function Leecher() {
       console.log(data);
       setContents(data);
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   };
   useEffect(() => {
@@ -84,15 +93,16 @@ function Leecher() {
     return () => clearInterval(interval);
   }, []);
   return (
-    <section className="flex flex-col gap-4 w-full h-full p-4">
-      <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
-        <img
-          className="h-full w-full rounded-2xl"
-          src={BackgroundImage}
-          alt="background-image"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent rounded-2xl"></div>
-        {/* <div className="absolute inset-0 flex items-center justify-center">
+    <>
+      <section className="flex flex-col gap-4 w-full h-full p-4">
+        <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
+          <img
+            className="h-full w-full rounded-2xl"
+            src={BackgroundImage}
+            alt="background-image"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent rounded-2xl"></div>
+          {/* <div className="absolute inset-0 flex items-center justify-center">
           <button
             className="bg-white/80 hover:bg-white text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
             onClick={handleCall} // Uncomment this line to connect to refresh logic
@@ -101,14 +111,106 @@ function Leecher() {
             &#x21bb; Refresh
           </button>
         </div> */}
+        </section>
+        <h1 className="font-semibold text-xl">Contents</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+          {contents.map((content, index) => (
+            <Contents key={index} item={content} onClick={()=> setOpen(true)} />
+          ))}
+        </div>
       </section>
-      <h1 className="font-semibold text-xl">Contents</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
-        {contents.map((content, index) => (
-          <Contents key={index} item={content} />
-        ))}
-      </div>
-    </section>
+      {open && (
+        <Dialog open={!!open} onOpenChange={setOpen}>
+          <DialogTrigger>Open</DialogTrigger>
+          <DialogContent className="bg-white text-black rounded-md shadow-lg border-none">
+            {downloading ? (
+              <>
+                <DialogTitle className="flex flex-col items-center justify-center">
+                  <img
+                    src={downloaded ? CompleteGif : DownloadingGif}
+                    alt="downloading..."
+                  />
+                  <p className="font-bold text-2xl text-gray-500">
+                    {downloaded ? "Download Completed!" : "Downloading..."}
+                  </p>
+                </DialogTitle>
+                <DialogFooter>
+                  <Button
+                    className={`${
+                      downloaded ? "bg-green-500" : "bg-red-700"
+                    } text-white cursor-pointer ${
+                      downloaded ? "hover:bg-green-600" : "hover:bg-red-800"
+                    } transition duration-200 ease-in-out shadow-xl/30`}
+                    onClick={() => {
+                      setOpen(false);
+                      setDownloading(false);
+                      setDownloaded(false);
+                      window.location.href = "/leech";
+                    }}
+                  >
+                    {downloaded ? "Go to Dashboard" : "Close"}
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <>
+                <DialogTitle>
+                  <p className="font-bold">{contents.fileDescription}</p>
+                </DialogTitle>
+                <DialogHeader>
+                  {contents.fileSegments.length > 0 ? (
+                    contents.fileSegments.map((fileSegment, index) => (
+                      <div key={index} className="flex flex-col gap-2 p-4">
+                        <p className="font-semibold ">
+                          File Hash:{" "}
+                          <span className="text-blue-700">
+                            {" "}
+                            {fileSegment.fileSegmentHash}{" "}
+                          </span>
+                        </p>
+                        <p className="font-semibold">
+                          File Size:{" "}
+                          <span className="text-gray-500">
+                            {fileSegment.segContentSize}
+                          </span>
+                        </p>
+                        <p className="font-semibold">
+                          Segment Number:{" "}
+                          <span className="text-gray-500">
+                            {fileSegment.SegmentNumber}
+                          </span>
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col gap-2 p-4">
+                      <h1 className="font-bold">No file segments found</h1>
+                    </div>
+                  )}
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    className="bg-red-700 text-white cursor-pointer hover:bg-red-800 transition duration-200 ease-in-out shadow-xl/30"
+                    onClick={() => setOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setDownloading(true);
+                      handleDownload();
+                    }}
+                    className="bg-green-500 text-white cursor-pointer hover:bg-green-600 transition duration-200 ease-in-out shadow-xl/30"
+                  >
+                    Download
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 
