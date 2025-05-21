@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { FetchTrackerFile } from "../../wailsjs/go/main/App.js";
 
 function Leecher() {
-  const port = localStorage.getItem("port");
+  const url = localStorage.getItem("url");
   const contents = [
     {
       id: 1,
@@ -113,7 +113,7 @@ function Leecher() {
   const handleCall = async ()=> {
     try {
         console.log("Hello");
-        await FetchTrackerFile(port);
+        await FetchTrackerFile(url);
       } catch (error) {
         console.error("Error fetching tracker content:", error);
       }

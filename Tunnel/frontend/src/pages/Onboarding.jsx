@@ -24,7 +24,7 @@ function Onboarding() {
   });
   const handleLogin = async(data) => {
     try {
-      console.log("Login data:", data);
+      console.log("Login data:", data.port);
       
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port);
@@ -32,7 +32,7 @@ function Onboarding() {
       
       if(true) {
         window.location.href = `/leech`
-        localStorage.setItem("port", data.port);
+        localStorage.setItem("url", data.url);
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
