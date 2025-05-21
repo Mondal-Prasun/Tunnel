@@ -4,7 +4,8 @@ import { Button } from "../components/ui/button";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FetchTrackerFile, ListenToPeers } from "../../wailsjs/go/main/App.js";
+import { FetchTrackerFile, ListenToPeers, GetRequiredContent } from "../../wailsjs/go/main/App.js";
+import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
   url: yup.string().url("Invalid URL").required("URL is required"),
@@ -16,7 +17,10 @@ const schema = yup.object({
     .max(10000, "Port must be less than or equal to 10,000"),
 });
 
+
+
 function Onboarding() {
+  const navigate = useNavigate()
   const [screen, setScreen] = useState("Home");
   const { handleSubmit, register, formState } = useForm({
     resolver: yupResolver(schema),
@@ -26,9 +30,11 @@ function Onboarding() {
       console.log("Login data:", data.port);
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
+      await GetRequiredContent();
       console.log("after ", data);
       if (true) {
-        window.location.href = `/leech`;
+        // window.location.href = `/leech`;
+        navigate("/leech")
         localStorage.setItem("url", data.url);
       }
     } catch (error) {

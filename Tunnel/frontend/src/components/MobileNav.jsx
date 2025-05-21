@@ -20,11 +20,10 @@ function MobileNav() {
                         <Button
                           size="icon"
                           // variant={path.active ? "default" : "outline"}
-                          className={`${
-                            path.active
-                              ? "bg-blue-500 text-white"
-                              : "bg-transparent"
-                          }`}
+                          className={`${path.active
+                            ? "bg-blue-500 text-white"
+                            : "bg-transparent"
+                            }`}
                         >
                           {path.icon}
                         </Button>

@@ -1,10 +1,7 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
 import { useEffect, useState } from "react";
-import {
-  FetchTrackerFile,
-  GetRequiredContent,
-} from "../../wailsjs/go/main/App.js";
+import { FetchTrackerFile, ListenToPeers, GetRequiredContent } from "../../wailsjs/go/main/App.js";
 
 function Leecher() {
   const url = localStorage.getItem("url");
@@ -69,17 +66,14 @@ function Leecher() {
       ],
     },
   ];
-  const handleCall = async () => {
+  const handleCall = async (d) => {
     try {
-      console.log("Hello");
-      // await FetchTrackerFile(url);
-      const data = await GetRequiredContent();
-      console.log("Data from API:", data);
-      window.rumtime.LogPrint("Data from API:", data);
-      setContents(data);
-    } catch (error) {
-      console.error("Error fetching tracker content:", error);
+      const data = await GetRequiredContent()
+      console.log(data)
+    } catch (e) {
+      console.log(e)
     }
+
   };
   useEffect(() => {
     handleCall();
