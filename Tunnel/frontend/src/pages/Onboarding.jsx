@@ -30,7 +30,6 @@ function Onboarding() {
       console.log("Login data:", data.port);
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
-      await GetRequiredContent();
       console.log("after ", data);
       if (true) {
         // window.location.href = `/leech`;
