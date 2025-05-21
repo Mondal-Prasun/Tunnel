@@ -4,7 +4,11 @@ import { Button } from "../components/ui/button";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FetchTrackerFile, ListenToPeers, GetRequiredContent } from "../../wailsjs/go/main/App.js";
+import {
+  FetchTrackerFile,
+  ListenToPeers,
+  GetRequiredContent,
+} from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
@@ -17,10 +21,8 @@ const schema = yup.object({
     .max(10000, "Port must be less than or equal to 10,000"),
 });
 
-
-
 function Onboarding() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [screen, setScreen] = useState("Home");
   const { handleSubmit, register, formState } = useForm({
     resolver: yupResolver(schema),
@@ -31,9 +33,10 @@ function Onboarding() {
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
       console.log("after ", data);
+      localStorage.setItem("url", data.url);
+
       if (true) {
-        navigate("/leech")
-        localStorage.setItem("url", data.url);
+        navigate("/leech");
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);

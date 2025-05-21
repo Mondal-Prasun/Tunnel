@@ -1,9 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import ContentImage from "../assets/demo.jpg";
 import DownloadingGif from "../assets/searching.gif";
-import CompleteGif from "../assets/complete.gif";
+import CompleteGif from "../assets/success.gif";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 import { Button } from "./ui/button";
 
 function Contents({ item }) {
@@ -38,7 +45,18 @@ function Contents({ item }) {
       {open && (
         <Dialog open={!!open} onOpenChange={setOpen}>
           <DialogTrigger>Open</DialogTrigger>
-          <DialogContent className="bg-white text-black rounded-md shadow-lg border-none">
+          <DialogContent
+            className="bg-white text-black rounded-md shadow-lg border-none on-scrollbar"
+            style={{
+              width: "90vw",
+              maxWidth: "600px",
+              overflowY: "auto",
+              overflowX: "hidden", 
+              maxHeight: "80vh",
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
+          >
             {downloading ? (
               <>
                 <DialogTitle className="flex flex-col items-center justify-center">
@@ -63,7 +81,6 @@ function Contents({ item }) {
                       setDownloaded(false);
                       // window.location.href = "/leech";
                       navigate("/leech");
-
                     }}
                   >
                     {downloaded ? "Go to Dashboard" : "Close"}
@@ -75,13 +92,19 @@ function Contents({ item }) {
                 <DialogTitle>
                   <p className="font-bold">{item.fileDescription}</p>
                 </DialogTitle>
-                <DialogHeader>
+                <DialogHeader style={{display: "flex", flexDirection: "column", gap: "2rem"}}>
                   {item.fileSegments.length > 0 ? (
                     item.fileSegments.map((fileSegment, index) => (
-                      <div key={index} className="flex flex-col gap-2 p-4">
-                        <p className="font-semibold ">
+                      <div key={index} className="flex flex-col">
+                        <p className="font-semibold">
+                          Segment Number:{" "}
+                          <span className="text-gray-500">
+                            {fileSegment.SegmentNumber + 1}
+                          </span>
+                        </p>
+                        <p className="font-semibold break-all w-full">
                           File Hash:{" "}
-                          <span className="text-blue-700">
+                          <span className="text-blue-700 break-all w-full">
                             {" "}
                             {fileSegment.fileSegmentHash}{" "}
                           </span>
@@ -89,13 +112,7 @@ function Contents({ item }) {
                         <p className="font-semibold">
                           File Size:{" "}
                           <span className="text-gray-500">
-                            {fileSegment.segContentSize}
-                          </span>
-                        </p>
-                        <p className="font-semibold">
-                          Segment Number:{" "}
-                          <span className="text-gray-500">
-                            {fileSegment.SegmentNumber}
+                            {fileSegment.segFileSize}
                           </span>
                         </p>
                       </div>
