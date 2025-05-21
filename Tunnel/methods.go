@@ -71,7 +71,7 @@ func getTrackerFile(trackerUrl string) error {
 
 }
 
-func announceFile(filePath string, trackerUrl string) {
+func announceFile(filePath string, trackerUrl string, fileImage string, fileDescription string) {
 
 	tMeta, err := SegmentFile(filePath)
 
@@ -114,6 +114,7 @@ func announceFile(filePath string, trackerUrl string) {
 		FileName        string   `json:"fileName"`
 		FileSize        int64    `json:"fileSize"`
 		FileImage       string   `json:"fileImage"`
+		FileDescription string   `json:"fileDescription"`
 		FileHash        string   `json:"fileHash"`
 		FileExt         string   `json:"fileExt"`
 		AllSegmentCount int8     `json:"allSegmentCount"`
@@ -122,7 +123,7 @@ func announceFile(filePath string, trackerUrl string) {
 		UAddress:        PEER_ADDRESS,
 		FileName:        tMeta.ParentFileName,
 		FileSize:        pFileInfo.Size(),
-		FileImage:       "", //fix it later
+		FileImage:       fileImage, //fix it later
 		FileHash:        tMeta.ParentFilehash,
 		FileExt:         tMeta.ParentFileExtention,
 		AllSegmentCount: tMeta.SegmentCount,
@@ -251,6 +252,8 @@ type SegmentFileAddress struct {
 type TunnelTracerContent struct {
 	FileHash         string               `json:"fileHash"`
 	FileName         string               `json:"fileName"`
+	FileImage        string               `json:"fileImage"`
+	FileDescription  string               `json:"fileDescription"`
 	FileSize         int64                `json:"fileSize"`
 	AllSegmentCount  int8                 `json:"allSegmentCount"`
 	FileExt          string               `json:"fileExt"`

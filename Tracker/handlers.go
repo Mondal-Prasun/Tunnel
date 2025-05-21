@@ -39,6 +39,8 @@ type SegmentFileAddress struct {
 type TunnelTracerContent struct {
 	FileHash         string               `json:"fileHash"`
 	FileName         string               `json:"fileName"`
+	FileImage        string               `json:"fileImage"`
+	FileDescription  string               `json:"fileDescription"`
 	FileSize         int64                `json:"fileSize"`
 	AllSegmentCount  int8                 `json:"allSegmentCount"`
 	FileExt          string               `json:"fileExt"`
@@ -73,6 +75,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		FileName        string   `json:"fileName"`
 		FileSize        int64    `json:"fileSize"`
 		FileImage       string   `json:"fileImage"`
+		FileDescription string   `json:"fileDescription"`
 		FileHash        string   `json:"fileHash"`
 		FileExt         string   `json:"fileExt"`
 		AllSegmentCount int8     `json:"allSegmentCount"`
@@ -183,6 +186,8 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		FileHash:         body.FileHash,
 		FileName:         body.FileName,
 		FileSize:         body.FileSize,
+		FileImage:        body.FileImage,
+		FileDescription:  body.FileDescription,
 		AllSegmentCount:  body.AllSegmentCount,
 		FileExt:          body.FileExt,
 		AllFileSegements: segmentFileAddress,
