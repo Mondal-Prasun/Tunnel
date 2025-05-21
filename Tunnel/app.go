@@ -43,3 +43,15 @@ func (a *App) ListenToPeers(port string) error {
 
 	return nil
 }
+
+func (a *App) GetRequiredContent() ([]TunnelTracerContent, error) {
+
+	content, err := getTrackerContent()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
+
+}

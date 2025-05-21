@@ -6,6 +6,10 @@ export function FetchTrackerFile(arg1) {
   return window['go']['main']['App']['FetchTrackerFile'](arg1);
 }
 
+export function GetRequiredContent() {
+  return window['go']['main']['App']['GetRequiredContent']();
+}
+
 export function ListenToPeers(arg1) {
   return window['go']['main']['App']['ListenToPeers'](arg1);
 }
