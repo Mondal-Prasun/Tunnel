@@ -1,12 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ContentImage from "../assets/demo.jpg";
 import DownloadingGif from "../assets/searching.gif";
 import CompleteGif from "../assets/complete.gif";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Button } from "./ui/button";
 
 function Contents({ item }) {
   const [open, setOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const navigate = useNavigate();
   const handleDownload = () => {
     console.log("Download clicked");
     // Handle the download logic here
@@ -57,7 +61,9 @@ function Contents({ item }) {
                       setOpen(false);
                       setDownloading(false);
                       setDownloaded(false);
-                      window.location.href = "/leech";
+                      // window.location.href = "/leech";
+                      navigate("/leech");
+
                     }}
                   >
                     {downloaded ? "Go to Dashboard" : "Close"}
