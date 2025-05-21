@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FetchTrackerFile } from "../../wailsjs/go/main/App.js";
+import { FetchTrackerFile, ListenToPeers } from "../../wailsjs/go/main/App.js";
 
 const schema = yup.object({
   url: yup.string().url("Invalid URL").required("URL is required"),
@@ -16,28 +16,26 @@ const schema = yup.object({
     .max(10000, "Port must be less than or equal to 10,000"),
 });
 
-
 function Onboarding() {
   const [screen, setScreen] = useState("Home");
-  const {handleSubmit, register, formState} = useForm({
-    resolver: yupResolver(schema)
+  const { handleSubmit, register, formState } = useForm({
+    resolver: yupResolver(schema),
   });
-  const handleLogin = async(data) => {
+  const handleLogin = async (data) => {
     try {
       console.log("Login data:", data.port);
-      
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port);
-      console.log("after ",data);
-      
-      if(true) {
-        window.location.href = `/leech`
+      console.log("after ", data);
+
+      if (true) {
+        window.location.href = `/leech`;
         localStorage.setItem("url", data.url);
       }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
     }
-  }
+  };
   return (
     <>
       <div className="flex h-screen">
@@ -63,69 +61,68 @@ function Onboarding() {
                 </div>
               </>
             )}
-          
-          {screen === "Login" && (
-            <>
-              <div className="w-full max-w-[496px] z-50">
-                <div className="font-semibold text-gray-400 text-2xl">
-                  Tunnel Application
-                </div>
-                <div className="my-4">
-                  <h4 className="text-4xl font-semibold">Login 👋</h4>
-                  <p className="text-gray-500 mt-3">
-                    A chat app where you can have unlimited chats...
-                  </p>
-                </div>
-                <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-4">
-                    <label htmlFor="url" className="text-gray-600">
-                      Tracker URL
-                    </label>
-                    <input
-                      type="url"
-                      className="border border-gray-500 rounded-md py-2 px-3"
-                      placeholder="Enter your URL here..."
-                      defaultValue=""
-                      {...register("url")}
-                    />
-                    {
-                      formState.errors.url && (
+
+            {screen === "Login" && (
+              <>
+                <div className="w-full max-w-[496px] z-50">
+                  <div className="font-semibold text-gray-400 text-2xl">
+                    Tunnel Application
+                  </div>
+                  <div className="my-4">
+                    <h4 className="text-4xl font-semibold">Login 👋</h4>
+                    <p className="text-gray-500 mt-3">
+                      A chat app where you can have unlimited chats...
+                    </p>
+                  </div>
+                  <form
+                    onSubmit={handleSubmit(handleLogin)}
+                    className="flex flex-col gap-2"
+                  >
+                    <div className="flex flex-col gap-4">
+                      <label htmlFor="url" className="text-gray-600">
+                        Tracker URL
+                      </label>
+                      <input
+                        type="url"
+                        className="border border-gray-500 rounded-md py-2 px-3"
+                        placeholder="Enter your URL here..."
+                        defaultValue=""
+                        {...register("url")}
+                      />
+                      {formState.errors.url && (
                         <p className="text-sm text-red-500">
                           {formState.errors.url.message}
                         </p>
-                      )
-                    }
-                  </div>
-                  <div className="flex relative flex-col gap-2">
-                    <label htmlFor="password" className="text-gray-600">
-                      Port
-                    </label>
-                    <input
-                      className="border border-gray-500 rounded-md py-2 px-3"
-                      placeholder="Enter your port number here..."
-                      type="number"
-                      defaultValue=""
-                      {...register("port")}
-                    />
-                    {
-                      formState.errors.port && (
+                      )}
+                    </div>
+                    <div className="flex relative flex-col gap-2">
+                      <label htmlFor="password" className="text-gray-600">
+                        Port
+                      </label>
+                      <input
+                        className="border border-gray-500 rounded-md py-2 px-3"
+                        placeholder="Enter your port number here..."
+                        type="number"
+                        defaultValue=""
+                        {...register("port")}
+                      />
+                      {formState.errors.port && (
                         <p className="text-sm text-red-500">
                           {formState.errors.port.message}
                         </p>
-                      )
-                    }
-                  </div>
-                  <Button
-                    type="submit"
-                    onClick={handleLogin}
-                    className="bg-gray-800 text-white cursor-pointer my-4 hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30"
-                  >
-                    Login
-                  </Button>
-                </form>
-              </div>
-            </>
-          )}
+                      )}
+                    </div>
+                    <Button
+                      type="submit"
+                      onClick={handleLogin}
+                      className="bg-gray-800 text-white cursor-pointer my-4 hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30"
+                    >
+                      Login
+                    </Button>
+                  </form>
+                </div>
+              </>
+            )}
           </div>
         </section>
         <section className="hidden lg:flex w-1/3 h-full">

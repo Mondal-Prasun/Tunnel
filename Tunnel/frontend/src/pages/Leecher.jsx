@@ -110,21 +110,21 @@ function Leecher() {
       description: "Description for content 16",
     },
   ];
-  const handleCall = async ()=> {
+  const handleCall = async () => {
     try {
-        console.log("Hello");
-        await FetchTrackerFile(url);
-      } catch (error) {
-        console.error("Error fetching tracker content:", error);
-      }
-  }
-  useEffect(()=> {
+      console.log("Hello");
+      await FetchTrackerFile(url);
+    } catch (error) {
+      console.error("Error fetching tracker content:", error);
+    }
+  };
+  useEffect(() => {
     handleCall();
-    const interval = setTimeout(async ()=> {
+    const interval = setTimeout(async () => {
       handleCall();
-      return ()=> clearInterval(interval);
-    }, 5000)
-  },[])
+      return () => clearInterval(interval);
+    }, 5000);
+  }, []);
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
