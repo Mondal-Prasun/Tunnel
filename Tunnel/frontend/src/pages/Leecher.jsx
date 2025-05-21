@@ -1,130 +1,90 @@
 import Contents from "@/components/Contents";
 import BackgroundImage from "../assets/leech-background.jpg";
-import { useEffect } from "react";
-import { FetchTrackerFile } from "../../wailsjs/go/main/App.js";
+import { useEffect, useState } from "react";
+import { FetchTrackerFile, GetRequiredContent } from "../../wailsjs/go/main/App.js";
 
 function Leecher() {
   const url = localStorage.getItem("url");
-  const contents = [
+  const [contents, setContents] = useState([]);
+  const ok = [
     {
-      id: 1,
-      thumbnail: "https://via.placeholder.com/150/0000FF/808080?text=Content+1",
-      title: "Content 1",
-      description: "Description for content 1",
-    },
-    {
-      id: 2,
-      thumbnail: "https://via.placeholder.com/150/FF0000/FFFFFF?text=Content+2",
-      title: "Content 2",
-      description: "Description for content 2",
-    },
-    {
-      id: 3,
-      thumbnail: "https://via.placeholder.com/150/00FF00/000000?text=Content+3",
-      title: "Content 3",
-      description: "Description for content 3",
-    },
-    {
-      id: 4,
-      thumbnail: "https://via.placeholder.com/150/FFFF00/000000?text=Content+4",
-      title: "Content 4",
-      description: "Description for content 4",
-    },
-    {
-      id: 5,
-      thumbnail: "https://via.placeholder.com/150/FF00FF/FFFFFF?text=Content+5",
-      title: "Content 5",
-      description: "Description for content 5",
-    },
-    {
-      id: 6,
-      thumbnail: "https://via.placeholder.com/150/00FFFF/000000?text=Content+6",
-      title: "Content 6",
-      description: "Description for content 6",
-    },
-    {
-      id: 7,
-      thumbnail: "https://via.placeholder.com/150/800000/FFFFFF?text=Content+7",
-      title: "Content 7",
-      description: "Description for content 7",
-    },
-    {
-      id: 8,
-      thumbnail: "https://via.placeholder.com/150/808000/FFFFFF?text=Content+8",
-      title: "Content 8",
-      description: "Description for content 8",
-    },
-    {
-      id: 9,
-      thumbnail: "https://via.placeholder.com/150/008080/FFFFFF?text=Content+9",
-      title: "Content 9",
-      description: "Description for content 9",
-    },
-    {
-      id: 10,
-      thumbnail:
-        "https://via.placeholder.com/150/800080/FFFFFF?text=Content+10",
-      title: "Content 10",
-      description: "Description for content 10",
-    },
-    {
-      id: 11,
-      thumbnail:
-        "https://via.placeholder.com/150/000080/FFFFFF?text=Content+11",
-      title: "Content 11",
-      description: "Description for content 11",
-    },
-    {
-      id: 12,
-      thumbnail:
-        "https://via.placeholder.com/150/808080/FFFFFF?text=Content+12",
-      title: "Content 12",
-      description: "Description for content 12",
-    },
-    {
-      id: 13,
-      thumbnail:
-        "https://via.placeholder.com/150/FFA500/FFFFFF?text=Content+13",
-      title: "Content 13",
-      description: "Description for content 13",
-    },
-    {
-      id: 14,
-      thumbnail:
-        "https://via.placeholder.com/150/FFC0CB/FFFFFF?text=Content+14",
-      title: "Content 14",
-      description: "Description for content 14",
-    },
-    {
-      id: 15,
-      thumbnail:
-        "https://via.placeholder.com/150/ADD8E6/FFFFFF?text=Content+15",
-      title: "Content 15",
-      description: "Description for content 15",
-    },
-    {
-      id: 16,
-      thumbnail:
-        "https://via.placeholder.com/150/90EE90/FFFFFF?text=Content+16",
-      title: "Content 16",
-      description: "Description for content 16",
+      fileHash:
+        "a4406c90d99c8c3be19fa8cf6c5d34c7bd462d61edb98a00f01324cafa21c052",
+      fileName: "blossom.mp4",
+      fileSize: 62781236,
+      allSegmentCount: 6,
+      fileExt: ".mp4",
+      fileSegments: [
+        {
+          fileSegmentHash:
+            "5ee442944bd3fbb9fe06d494c0585520c666b51da0e0b95e9a857ae6fb54327a",
+          segContentSize: 10464256,
+          segFileSize: 10464508,
+          SegmentNumber: 0,
+          segAddress: ["127.0.0.1:6000"],
+        },
+        {
+          fileSegmentHash:
+            "21f4552784245410d946d7fed391bf7e68df9cafbda210fbd03e505b5ffb8a3b",
+          segContentSize: 10464256,
+          segFileSize: 10464508,
+          SegmentNumber: 1,
+          segAddress: ["127.0.0.1:6000"],
+        },
+        {
+          fileSegmentHash:
+            "118ebfb1bfe904eb6d98fa71ba47f300894ea9e73dac724005c8818e6612b192",
+          segContentSize: 10464256,
+          segFileSize: 10464508,
+          SegmentNumber: 2,
+          segAddress: ["127.0.0.1:6000"],
+        },
+        {
+          fileSegmentHash:
+            "082657d9ee96d7fa232a7867477ebb8e20af4eaef938e5d78f8bcbd9e2c277f8",
+          segContentSize: 10464256,
+          segFileSize: 10464508,
+          SegmentNumber: 3,
+          segAddress: ["127.0.0.1:6000"],
+        },
+        {
+          fileSegmentHash:
+            "f7dfea510b7a18aed71835067027967c32e7611ea592fc8b4ab6a39c8ac5e9c8",
+          segContentSize: 10464256,
+          segFileSize: 10464508,
+          SegmentNumber: 4,
+          segAddress: ["127.0.0.1:6000"],
+        },
+        {
+          fileSegmentHash:
+            "3701cd37e60da0b11853b04c33fc135b67f6e789c5dca4d9598fb86c09e0f077",
+          segContentSize: 10459956,
+          segFileSize: 10464508,
+          SegmentNumber: 5,
+          segAddress: ["127.0.0.1:6000"],
+        },
+      ],
     },
   ];
   const handleCall = async () => {
     try {
       console.log("Hello");
-      await FetchTrackerFile(url);
+      // await FetchTrackerFile(url);
+      const data = await GetRequiredContent();
+      console.log("Data from API:", data);
+      
+      setContents(data);
     } catch (error) {
       console.error("Error fetching tracker content:", error);
     }
   };
   useEffect(() => {
-  handleCall();
-  const interval = setInterval(() => {
     handleCall();
-  }, 5000);
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(() => {
+      handleCall();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
