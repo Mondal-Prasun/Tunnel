@@ -119,12 +119,12 @@ function Leecher() {
     }
   };
   useEffect(() => {
+  handleCall();
+  const interval = setInterval(() => {
     handleCall();
-    const interval = setTimeout(async () => {
-      handleCall();
-      return () => clearInterval(interval);
-    }, 5000);
-  }, []);
+  }, 5000);
+  return () => clearInterval(interval);
+}, []);
   return (
     <section className="flex flex-col gap-4 w-full h-full p-4">
       <section className="w-full mx-auto h-[250px] rounded-lg hidden md:block relative">
