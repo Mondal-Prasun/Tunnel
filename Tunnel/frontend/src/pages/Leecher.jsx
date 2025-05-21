@@ -72,7 +72,7 @@ function Leecher() {
       // await FetchTrackerFile(url);
       const data = await GetRequiredContent();
       console.log("Data from API:", data);
-      
+      window.rumtime.LogPrint("Data from API:", data);
       setContents(data);
     } catch (error) {
       console.error("Error fetching tracker content:", error);
