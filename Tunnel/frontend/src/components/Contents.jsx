@@ -112,7 +112,7 @@ function Contents({ item }) {
                         <p className="font-semibold">
                           File Size:{" "}
                           <span className="text-gray-500">
-                            {fileSegment.segFileSize}
+                            {(fileSegment.segFileSize/8)/1024} MB
                           </span>
                         </p>
                       </div>
