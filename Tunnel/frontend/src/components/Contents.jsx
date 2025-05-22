@@ -1,36 +1,35 @@
-import { Link, useNavigate } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
 import ContentImage from "../assets/demo.jpg";
-import DownloadingGif from "../assets/searching.gif";
-import CompleteGif from "../assets/success.gif";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+// import DownloadingGif from "../assets/searching.gif";
+// import CompleteGif from "../assets/success.gif";
+// import { useState } from "react";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "./ui/dialog";
+// import { Button } from "./ui/button";
 
 function Contents({ item }) {
-  const [open, setOpen] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
-  const navigate = useNavigate();
-  const handleDownload = () => {
-    console.log("Download clicked");
-    // Handle the download logic here
-    setTimeout(() => {
-      setDownloaded(true);
-    }, 5000); // Simulate a 2-second download time
-  };
+  // const [open, setOpen] = useState(false);
+  // const [downloading, setDownloading] = useState(false);
+  // const [downloaded, setDownloaded] = useState(false);
+  // const navigate = useNavigate();
+  // const handleDownload = () => {
+  //   console.log("Download clicked");
+  //   // Handle the download logic here
+  //   setTimeout(() => {
+  //     setDownloaded(true);
+  //   }, 5000); // Simulate a 2-second download time
+  // };
 
   return (
     <>
       <div
-        onClick={() => setOpen(true)}
-        className="flex flex-col gap-2 items-center w-full h-full bg-white rounded shadow-md"
+        className="flex flex-col gap-2 items-center w-full h-full bg-white rounded shadow-md z-50"
       >
         <img
           src={ContentImage}
@@ -39,10 +38,9 @@ function Contents({ item }) {
         />
         <div className="w-full px-4 pb-4">
           <h2 className="font-bold">{item.fileDescription}</h2>
-          {/* <p>{item.description}</p> */}
         </div>
       </div>
-      {open && (
+      {/* {open && (
         <Dialog open={!!open} onOpenChange={setOpen}>
           <DialogTrigger>Open</DialogTrigger>
           <DialogContent
@@ -144,7 +142,7 @@ function Contents({ item }) {
             )}
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
     </>
   );
 }
