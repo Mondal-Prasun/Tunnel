@@ -21,6 +21,7 @@ function Assembler() {
   const [buildingDone, setBuildingDone] = useState(false);
   const [open, setOpen] = useState(false);
   const [neededFileSegments, setNeededFileSegments] = useState([]);
+  const [contents, setContents] = useState([]);
 
   // const contents = [
   //   {
@@ -87,7 +88,7 @@ function Assembler() {
   const handleGetRequitredContents = async () => {
     try {
       const data = await GetRequiredContent();
-      // setContents(data);
+      setContents(data);
     } catch (error) {
       console.error("Error fetching required content:", error);
       alert("Error fetching required content");
