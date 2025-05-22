@@ -5,7 +5,7 @@ const DashBoard = lazy(() => import("@/Layout/Dashboard"));
 const Leecher = lazy(() => import("@/pages/Leecher"));
 const Onboarding = lazy(() => import("@/pages/Onboarding"));
 const Seeder = lazy(() => import("@/pages/Seeder"));
-const ContentDetails = lazy(() => import("@/pages/ContentDetails"));
+const Assembler = lazy(() => import("@/pages/Assembler"));
 
 const Navigations = () => {
   return (
@@ -16,8 +16,8 @@ const Navigations = () => {
           <Route index path="/" element={<Onboarding />} />
           <Route element={<DashBoard />}>
             <Route path="/leech" element={<Leecher />} />
-            <Route path="/leech/:leechId?" element={<ContentDetails />} />
             <Route path="/seeder" element={<Seeder />} />
+            <Route path="/assembler" element={<Assembler />} />
           </Route>
         </Routes>
       </BrowserRouter>
