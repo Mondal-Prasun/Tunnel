@@ -54,7 +54,7 @@ func (a *App) GetRequiredContent() ([]TunnelTracerContent, error) {
 		return nil, err
 	}
 
-	log.Println("GetRequiredConent: ", content)
+	// log.Println("GetRequiredConent: ", content)
 
 	return content, err
 
@@ -105,6 +105,8 @@ func (a *App) CheckIfAllSegmentAreAvaliable(allSeg []SegmentFileAddress) ([]Segm
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println("CheckIF", needSeg)
 
 	return needSeg, nil
 }

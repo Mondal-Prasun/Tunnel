@@ -56,5 +56,6 @@ const (
 //Tracker json File Constants
 
 const (
-	TRACKER_FILE_NAME string = "track/tracker.json"
+	TRACKFILE_FOLDER         = "track"
+	TRACKER_FILE_NAME string = "tracker.json"
 )

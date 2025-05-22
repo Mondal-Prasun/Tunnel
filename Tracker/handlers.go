@@ -109,6 +109,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 
 	// 	cF.WriteString("[]")
 	// }
+	// log.Println("Announce: ", body)
 
 	rFile, err := os.Open(TRACKER_FILE_NAME)
 
@@ -148,7 +149,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tFile, err := os.Create(TRACKER_FILE_NAME)
+	tFile, err := os.Create(fmt.Sprintf("%s/%s", TRACKFILE_FOLDER, TRACKER_FILE_NAME))
 	if err != nil {
 		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while:%s", err.Error()))
 		return
@@ -226,5 +227,5 @@ func (t *Tunnel) GetTrackerFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachmet; filename=\"tracker.json\"")
 	w.Header().Set("Content-type", "application/octet-stream")
 
-	http.ServeFile(w, r, TRACKER_FILE_NAME)
+	http.ServeFile(w, r, fmt.Sprintf("%s/%s", TRACKFILE_FOLDER, TRACKER_FILE_NAME))
 }
