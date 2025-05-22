@@ -1,5 +1,5 @@
 import { CloudUpload } from "lucide-react";
-import BackgroundImage from "../assets/upload.jpg";
+import BackgroundImage from "../assets/seeder.png";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -155,7 +155,7 @@ function Seeder() {
             </form>
           </div>
         </section>
-        <section className="hidden lg:flex w-1/3 h-full">
+        <section className="hidden lg:flex w-1/3 -scale-x-100 h-full">
           <img
             src={BackgroundImage}
             alt="seeder"

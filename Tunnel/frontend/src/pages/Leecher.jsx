@@ -6,10 +6,19 @@ import {
   ListenToPeers,
   GetRequiredContent,
 } from "../../wailsjs/go/main/App.js";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 function Leecher() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
@@ -275,21 +284,28 @@ function Leecher() {
             src={BackgroundImage}
             alt="background-image"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent rounded-2xl" style={{ top: '-40px', height: 'calc(100% + 40px)' }}></div>
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent rounded-2xl"
+            style={{ top: "-40px", height: "calc(100% + 40px)" }}
+          ></div>
           <div className="absolute top-80 inset-0 flex items-center justify-center">
-          <button
-            className="bg-white/40 hover:bg-white/60 text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
-            onClick={handleCall} // Uncomment this line to connect to refresh logic
-            type="button"
-          >
-            &#x21bb; Refresh
-          </button>
-        </div>
+            <button
+              className="bg-white/40 hover:bg-white/60 text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
+              onClick={handleCall}
+              type="button"
+            >
+              &#x21bb; Refresh
+            </button>
+          </div>
         </section>
         <h1 className="font-semibold text-xl">Contents</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
           {contents.map((content, index) => (
-            <Contents key={index} item={content} onClick={()=> setOpen(true)} />
+            <Contents
+              key={index}
+              item={content}
+              onClick={() => setOpen(true)}
+            />
           ))}
         </div>
       </section>
@@ -319,7 +335,7 @@ function Leecher() {
                       setOpen(false);
                       setDownloading(false);
                       setDownloaded(false);
-                      window.location.href = "/leech";
+                      navigate("/assembler")
                     }}
                   >
                     {downloaded ? "Go to Dashboard" : "Close"}
