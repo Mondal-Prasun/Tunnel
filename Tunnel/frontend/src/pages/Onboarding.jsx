@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import {
   FetchTrackerFile,
   ListenToPeers,
-  GetRequiredContent,
+  MakeOriginaleFile,
 } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
 
@@ -29,12 +29,12 @@ function Onboarding() {
   });
   const handleLogin = async (data) => {
     try {
+      localStorage.setItem("url", data.url);
       console.log("Login data:", data.port);
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
+      await MakeOriginaleFile();
       console.log("after ", data);
-      localStorage.setItem("url", data.url);
-
       if (true) {
         navigate("/leech");
       }
