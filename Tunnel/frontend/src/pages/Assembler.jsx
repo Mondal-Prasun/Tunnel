@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import CompleteGif from "@/assets/complete.gif";
-import DownloadingGif from "@/assets/downloading.gif";
+import CompleteGif from "../assets/complete.gif";
+import DownloadingGif from "../assets/searching.gif";
 
 const Contents = lazy(() => import("@/components/Contents"));
 
