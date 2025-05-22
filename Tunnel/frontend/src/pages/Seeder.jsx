@@ -20,8 +20,11 @@ const schema = yup.object({
     .test("fileSize", "File size is too large", (value) => {
       return value && value[0] && value[0].size <= 2 * 1024 * 1024; // 2MB limit
     }),
-  title: yup.string().required("Title is required"),
-  filePath: yup.string().url("Invalid URL").required("File path is required"),
+  title: yup.string().required("Title is required"),filePath: yup
+  .mixed()
+  .test("fileExists", "File is required", value => {
+    return value && value.length > 0;
+  }),
 });
 
 function Seeder() {
@@ -75,6 +78,7 @@ function Seeder() {
                 </label>
                 <input
                   type="file"
+                  accept="image/jpeg,image/png,image/jpg" // <-- restrict file types in the file picker
                   className="border border-dashed border-gray-500 rounded-md py-2 px-3 "
                   {...register("thumbnail")}
                   onChange={(e) => setThumbnail(e.target.files[0])}
@@ -110,14 +114,12 @@ function Seeder() {
                 )}
               </div>
               <div className="flex relative flex-col gap-2">
-                <label htmlFor="password" className="text-gray-600">
-                  File path
+                <label htmlFor="filePath" className="text-gray-600">
+                  File Path
                 </label>
                 <input
-                  type="url"
-                  placeholder="Enter your file path here..."
-                  className="border border-gray-500 rounded-md py-2 px-3 placeholder:text-gray-900"
-                  defaultValue=""
+                  type="file"
+                  className="border border-gray-500 rounded-md py-2 px-3"
                   {...register("filePath")}
                 />
                 {formState.errors.filePath && (

@@ -1,4 +1,4 @@
-import BackgroundImage from "../assets/onboarding-page.jpg";
+import BackgroundImage from "../assets/onboarding.png";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { useForm } from "react-hook-form";
@@ -50,12 +50,11 @@ function Onboarding() {
             {screen === "Home" && (
               <>
                 <h2 className="bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
-                  Explore new World of Blogging!
+                  Share anything with our <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Tunnel!</span>
                 </h2>
                 <p className="max-w-xl mx-auto text-sm md:text-lg text-neutral-700 dark:text-neutral-400 text-center">
-                  A full-stack blogging application built with Next.js,
-                  featuring seamless content management, user authentication,
-                  and dynamic rendering.
+                  A TCP and LAN based Peer to Peer file sharing application that
+                  allows you to share files with your friends and family.
                 </p>
                 <div className="mt-4 z-50">
                   <Button
@@ -75,9 +74,9 @@ function Onboarding() {
                     Tunnel Application
                   </div>
                   <div className="my-4">
-                    <h4 className="text-4xl font-semibold">Login 👋</h4>
+                    <h4 className="text-4xl font-semibold">Connect 👋</h4>
                     <p className="text-gray-500 mt-3">
-                      A chat app where you can have unlimited chats...
+                      Connect to your prefered <span className="font-bold">tracker...</span> 
                     </p>
                   </div>
                   <form
@@ -123,7 +122,7 @@ function Onboarding() {
                       onClick={handleLogin}
                       className="bg-gray-800 text-white cursor-pointer my-4 hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30"
                     >
-                      Login
+                      Connect
                     </Button>
                   </form>
                 </div>
@@ -131,7 +130,7 @@ function Onboarding() {
             )}
           </div>
         </section>
-        <section className="hidden lg:flex w-1/3 h-full">
+        <section className="lg:flex w-full -scale-x-100 lg:w-1/3  h-full right-0">
           <img
             src={BackgroundImage}
             alt="Onboarding image"
