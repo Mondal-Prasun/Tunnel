@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { AnnounceCurrentFile } from "../../wailsjs/go/main/App.js";
+import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
   thumbnail: yup
@@ -16,18 +18,20 @@ const schema = yup.object({
         value[0] &&
         ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
       );
-    })
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value[0] && value[0].size <= 2 * 1024 * 1024; // 2MB limit
     }),
-  title: yup.string().required("Title is required"),filePath: yup
-  .mixed()
-  .test("fileExists", "File is required", value => {
-    return value && value.length > 0;
-  }),
+  title: yup.string().required("Title is required"),
+  filePath: yup
+    .string()
+    .required("File path is required")
+    .test("validPath", "Invalid file path format", (value) => {
+      // Windows: C:\folder\file.txt or Unix: /home/user/file.txt
+      return /^([a-zA-Z]:\\|\/).+/.test(value);
+    }),
 });
 
 function Seeder() {
+  const url = localStorage.getItem("url");
+  const navigate = useNavigate();
   const [thumbnail, setThumbnail] = useState(null);
   const { handleSubmit, register, formState } = useForm({
     resolver: yupResolver(schema),
@@ -53,9 +57,21 @@ function Seeder() {
         title: data.title,
         filePath: data.filePath,
       };
-      // await AnnounceFile(payload);
+      console.log(payload.filePath);
+      console.log(payload.title);
+      console.log(payload.base64Thumbnail);
+      console.log("url: ",url);
+
+      await AnnounceCurrentFile(
+        data.filePath,
+        base64Thumbnail,
+        data.title,
+        url
+      );
+      navigate("/leech");
     } catch (error) {
       console.error("Error uploading content:", error);
+      alert("Error uploading content. Please try again.");
     }
     // Handle the upload logic here
   };
@@ -118,7 +134,8 @@ function Seeder() {
                   File Path
                 </label>
                 <input
-                  type="file"
+                  type="text"
+                  placeholder="Enter file path (e.g. C:\\Users\\... or /home/user/...)"
                   className="border border-gray-500 rounded-md py-2 px-3"
                   {...register("filePath")}
                 />
