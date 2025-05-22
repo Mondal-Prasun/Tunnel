@@ -148,7 +148,7 @@ func announceFile(filePath string, trackerUrl string, fileImage string, fileDesc
 		return err
 	}
 
-	res, err := http.Post(fmt.Sprintf("%s/announce", TRACKER_URL), "application-json", bytes.NewBuffer(marshaledata))
+	res, err := http.Post(fmt.Sprintf("%s/announce", trackerUrl), "application-json", bytes.NewBuffer(marshaledata))
 
 	if err != nil {
 		log.Println("Announce: ", err.Error())
