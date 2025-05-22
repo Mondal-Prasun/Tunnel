@@ -18,13 +18,16 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "Tunnel",
-		Width:     1200,
-		Height:    768,
-		MinWidth:  1100,
-		Frameless: true,
+		Title:    "Tunnel",
+		Width:    1200,
+		Height:   768,
+		MinWidth: 1100,
+		// Frameless: true,
 		Windows: &windows.Options{
-			Theme:                windows.SystemDefault,
+			Theme: windows.Dark,
+			CustomTheme: &windows.ThemeSettings{
+				DarkModeTitleBar: windows.RGB(255, 255, 255),
+			},
 			IsZoomControlEnabled: false,
 		},
 		AssetServer: &assetserver.Options{

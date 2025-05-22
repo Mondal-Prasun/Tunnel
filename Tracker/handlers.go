@@ -10,16 +10,7 @@ import (
 	// "github.com/google/uuid"
 )
 
-// type TunnelContent struct {
-// 	Cid              uuid.UUID `json:"id"`
-// 	Uid              uuid.UUID `json:"uid"`
-// 	UAddress         string    `json:"uAddress"`
-// 	FileName         string    `json:"fileName"`
-// 	FileSize         string    `json:"fileSize"`
-// 	FileImage        string    `json:"fileImage"`
-// 	FileHash         string    `json:"fileHash"`
-// 	FileSegmentsHash []string  `json:"fileSegmentsHash"`
-// }
+
 
 type SegDet struct {
 	FileSegmentHash string `json:"fileSegmentHash"`
@@ -98,18 +89,6 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 
 	mu.Lock()
 
-	// if _, err := os.Stat(TRACKER_FILE_NAME); err != nil {
-	// 	cF, err := os.Create(TRACKER_FILE_NAME)
-
-	// 	if err != nil {
-	// 		tr.ResponseWithError(503, fmt.Sprintf("Something went wrong while1:%s", err.Error()))
-	// 		return
-	// 	}
-	// 	defer cF.Close()
-
-	// 	cF.WriteString("[]")
-	// }
-	// log.Println("Announce: ", body)
 
 	rFile, err := os.Open(TRACKER_FILE_NAME)
 
@@ -156,12 +135,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tFile.Close()
 
-	// type SegmentFileAddress struct {
-	// 	FileSegmentHash string   `json:"fileSegmentHash"`
-	// 	SegContentSize  string   `json:"segContentSize"`
-	// 	SegmentNumber   string   `json:"SegmentNumber"`
-	// 	SegAddress      []string `json:"segAddress"`
-	// }
+
 
 	segmentFileAddress := make([]SegmentFileAddress, len(body.FileSegments))
 	for i, seg := range body.FileSegments {
@@ -174,14 +148,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// type TunnelTracerContent struct {
-	// 	FileHash         string               `json:"fileHash"`
-	// 	FileName         string               `json:"fileName"`
-	// 	FileSize         string               `json:"fileSize"`
-	// 	AllSegmentCount  string               `json:"allSegmentCount"`
-	// 	FileExt          string               `json:"fileExt"`
-	// 	AllFileSegements []SegmentFileAddress `json:"fileSegments"`
-	// }
+	
 
 	trackerCon := &TunnelTracerContent{
 		FileHash:         body.FileHash,
