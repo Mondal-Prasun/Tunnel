@@ -337,7 +337,6 @@ func requestSegments(parentFileHash string) error {
 	}
 
 	errChan := make(chan error)
-	defer close(errChan)
 
 	for _, nS := range neededSeg {
 		if nS.SegAddress[0] != PEER_ADDRESS {

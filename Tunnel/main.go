@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"os"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -13,11 +14,19 @@ import (
 var assets embed.FS
 
 func main() {
+
 	// Create an instance of the app structure
 	app := NewApp()
 
+	tempDir, err := os.MkdirTemp("", "wails_userdata_*")
+	if err != nil {
+		panic("Failed to create temp user data directory: " + err.Error())
+	}
+
+	defer os.RemoveAll(tempDir)
+
 	// Create application with options
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:    "Tunnel",
 		Width:    1200,
 		Height:   768,
@@ -29,6 +38,7 @@ func main() {
 				DarkModeTitleBar: windows.RGB(255, 255, 255),
 			},
 			IsZoomControlEnabled: false,
+			WebviewUserDataPath:  tempDir,
 		},
 		AssetServer: &assetserver.Options{
 			Assets: assets,
