@@ -1,1 +1,67 @@
-[]
+[
+ {
+  "fileHash": "5e80e5847a1c537ea15fc2857a65108e7d4b83eae12eb8c6b55eb770fe606cfc",
+  "fileName": "cat.mp4",
+  "fileImage": "",
+  "fileDescription": "test again",
+  "fileSize": 7187512,
+  "allSegmentCount": 6,
+  "fileExt": ".mp4",
+  "fileSegments": [
+   {
+    "fileSegmentHash": "e360054bf5b1a0ae2774fdd57a6fa72bc361350d3c4fae8d8be3f549d7b55922",
+    "segContentSize": 1198080,
+    "segFileSize": 1198331,
+    "SegmentNumber": 0,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   },
+   {
+    "fileSegmentHash": "a4a8b9639042b8c7971eb370f2d81769b03bc30552f03815eb5c3fdbfe94886d",
+    "segContentSize": 1198080,
+    "segFileSize": 1198331,
+    "SegmentNumber": 1,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   },
+   {
+    "fileSegmentHash": "1a0072122c4318cd969a6651395a5cb626bc9e80e4b4ac8d45e9b375a2632725",
+    "segContentSize": 1198080,
+    "segFileSize": 1198331,
+    "SegmentNumber": 2,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   },
+   {
+    "fileSegmentHash": "e60db59dd151e69b17d413513e6b6b9b6e6da0f9bf4a17c0bdab33d0990382e3",
+    "segContentSize": 1198080,
+    "segFileSize": 1198331,
+    "SegmentNumber": 3,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   },
+   {
+    "fileSegmentHash": "6956cbcaf534bd5334fc72511816a0621198002a45d7880d3a2266827efb7767",
+    "segContentSize": 1198080,
+    "segFileSize": 1198331,
+    "SegmentNumber": 4,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   },
+   {
+    "fileSegmentHash": "bce720b26a9f22e44f6855223bca26be95aab2aa4434a3fcd04eddf5e279abc8",
+    "segContentSize": 1197112,
+    "segFileSize": 1198331,
+    "SegmentNumber": 5,
+    "segAddress": [
+     "127.0.0.1:6000"
+    ]
+   }
+  ]
+ }
+]

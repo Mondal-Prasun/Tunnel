@@ -76,9 +76,9 @@ func (a *App) MakeRequiredFile() error {
 	return nil
 }
 
-func (a *App) AnnounceCurrentFile(filePath string, fileImage string, fileDescription string, trackerUrl string) error {
+func (a *App) AnnounceCurrentFile(filePath string, fileImage string, fileDescription string, trackerUrl string, port string) error {
 
-	err := announceFile(filePath, trackerUrl, fileImage, fileDescription)
+	err := announceFile(filePath, trackerUrl, fileImage, fileDescription, port)
 
 	if err != nil {
 		return err
@@ -118,5 +118,6 @@ func (a *App) MakeOriginaleFile(parentFileHash string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

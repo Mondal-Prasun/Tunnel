@@ -72,7 +72,7 @@ func getTrackerFile(trackerUrl string) error {
 
 }
 
-func announceFile(filePath string, trackerUrl string, fileImage string, fileDescription string) error {
+func announceFile(filePath string, trackerUrl string, fileImage string, fileDescription string, port string) error {
 
 	tMeta, err := SegmentFile(filePath)
 
@@ -121,7 +121,7 @@ func announceFile(filePath string, trackerUrl string, fileImage string, fileDesc
 		AllSegmentCount int8     `json:"allSegmentCount"`
 		FileSegments    []SegDet `json:"fileSegments"`
 	}{
-		UAddress:        PEER_ADDRESS,
+		UAddress:        fmt.Sprintf("127.0.0.1:%s", port),
 		FileName:        tMeta.ParentFileName,
 		FileSize:        pFileInfo.Size(),
 		FileImage:       fileImage, //fix it later
