@@ -104,7 +104,7 @@ function Leecher() {
     handleCall();
     const interval = setInterval(() => {
       handleCall();
-    }, 5000);
+    }, 1000 * 60);
     return () => clearInterval(interval);
   }, []);
   
