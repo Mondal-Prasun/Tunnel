@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AnnounceCurrentFile } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { encode } from "@/utils/common";
 
 const schema = yup.object({
   thumbnail: yup
@@ -44,15 +45,8 @@ function Seeder() {
         toast.error("Please select a thumbnail");
         return;
       }
-      const getBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-      };
-      const base64Thumbnail = await getBase64(thumbnail);
+      
+      const base64Thumbnail = encode(thumbnail.arrayBuffer);
       console.log("Base64 Thumbnail:", base64Thumbnail);
       const payload = {
         thumbnail: base64Thumbnail,

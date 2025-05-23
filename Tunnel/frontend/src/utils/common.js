@@ -1,15 +1,18 @@
-export const decode = (str) => {
-  const parts = str.split(",");
-  const base64Data = parts.length > 1 ? parts[1] : parts[0];
-  const contentType =
-    parts.length > 1 ? parts[0].split(":")[1].split(";")[0] : "";
-
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
+export const decode = (base64String) => {
+  const binaryString = atob(base64String);
+  const byteArray = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    byteArray[i] = binaryString.charCodeAt(i);
   }
-  const byteArray = new Uint8Array(byteNumbers);
-
-  return new Blob([byteArray], { type: contentType });
+  return byteArray;
 };
+
+export const encode = (buffer)=> {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for(let i=0; i<len;i++){
+        binary+= String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
