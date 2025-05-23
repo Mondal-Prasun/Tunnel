@@ -9,6 +9,7 @@ import { AnnounceCurrentFile } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { encode } from "@/utils/common";
+import base64 from "base-64";
 
 const schema = yup.object({
   thumbnail: yup
@@ -47,7 +48,7 @@ function Seeder() {
         return;
       }
       
-      const base64Thumbnail = encode(thumbnail.arrayBuffer);
+      const base64Thumbnail = base64.encode(thumbnail.arrayBuffer);
       console.log("Base64 Thumbnail:", base64Thumbnail);
       const payload = {
         thumbnail: base64Thumbnail,
