@@ -95,18 +95,17 @@ function Assembler() {
     }
   };
 
-  const handleCheckAllSegmentsAreAvaliable = async (
-    clickedContentFileSegments
-  ) => {
+  const handleCheckAllSegmentsAreAvaliable = async (clickedContent) => {
     try {
       const neededSegments = await CheckIfAllSegmentAreAvaliable(
-        clickedContentFileSegments
+        clickedContent.fileSegments
       );
       console.log("Needed Segments:", neededSegments);
-      if(neededFileSegments === null){
+      if (neededSegments === null) {
         setNeededFileSegments([]);
+      } else {
+        setNeededFileSegments(neededSegments);
       }
-      setNeededFileSegments(neededSegments);
       setOpen(true);
     } catch (error) {
       console.error("Error checking segments:", error);
@@ -118,7 +117,7 @@ function Assembler() {
     try {
       console.log("Building...");
       setBuilding(true);
-      await MakeOriginaleFile()
+      await MakeOriginaleFile();
       setTimeout(() => {
         setBuildingDone(true);
         setBuilding(false);
@@ -152,7 +151,7 @@ function Assembler() {
               key={index}
               onClick={() => {
                 console.log("Clicked content:");
-                handleCheckAllSegmentsAreAvaliable(content.fileSegments);
+                handleCheckAllSegmentsAreAvaliable(content);
               }}
             >
               <Contents item={content} />
