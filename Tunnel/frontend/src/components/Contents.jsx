@@ -8,7 +8,7 @@ function Contents({ item }) {
     <>
       <Card className="flex flex-col gap-2 items-center w-full h-full bg-white rounded-2xl shadow-md z-50 shadow-xl/30 pt-0">
         <img
-          src={decode(item.fileImage)}
+          src={atob(item.fileImage)}
           alt={item.fileName}
           className="w-full rounded-t-2xl"
         />
