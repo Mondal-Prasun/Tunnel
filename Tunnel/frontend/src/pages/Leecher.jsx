@@ -7,6 +7,7 @@ import {
   FetchTrackerFile,
   ListenToPeers,
   GetRequiredContent,
+  RequestRequiredSegments
 } from "../../wailsjs/go/main/App.js";
 import {
   Dialog,
@@ -27,6 +28,7 @@ function Leecher() {
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const url = localStorage.getItem("url");
+  const port = localStorage.getItem("port");
   let [contents, setContents] = useState([]);
   let [clickedContent, setClickedContent] = useState(null);
   // contents = [
@@ -126,6 +128,7 @@ function Leecher() {
   return (
     <>
       <section className="flex flex-col gap-4 w-full h-full p-4 relative">
+        <p>Port: {port}</p>
         <div className="absolute top-4 right-4 z-10">
           <button
             className="bg-white/40 hover:bg-white/60 text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
