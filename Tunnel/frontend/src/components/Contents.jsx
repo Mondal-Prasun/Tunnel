@@ -1,13 +1,14 @@
 import { CloudDownload } from "lucide-react";
 import ContentImage from "../assets/demo.jpg";
 import { Card } from "./ui/card";
+import { decode } from "@/utils/common";
 
 function Contents({ item }) {
   return (
     <>
       <Card className="flex flex-col gap-2 items-center w-full h-full bg-white rounded-2xl shadow-md z-50 shadow-xl/30 pt-0">
         <img
-          src={ContentImage}
+          src={decode(item.fileImage)}
           alt={item.fileName}
           className="w-full rounded-t-2xl"
         />
