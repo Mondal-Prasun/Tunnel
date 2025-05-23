@@ -103,6 +103,9 @@ function Assembler() {
         clickedContentFileSegments
       );
       console.log("Needed Segments:", neededSegments);
+      if(neededFileSegments === null){
+        setNeededFileSegments([]);
+      }
       setNeededFileSegments(neededSegments);
       setOpen(true);
     } catch (error) {
@@ -115,6 +118,7 @@ function Assembler() {
     try {
       console.log("Building...");
       setBuilding(true);
+      await MakeOriginaleFile()
       setTimeout(() => {
         setBuildingDone(true);
         setBuilding(false);
