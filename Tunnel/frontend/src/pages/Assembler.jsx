@@ -2,6 +2,7 @@ import { lazy, useEffect, useState } from "react";
 import {
   GetRequiredContent,
   CheckIfAllSegmentAreAvaliable,
+  MakeOriginaleFile
 } from "../../wailsjs/go/main/App.js";
 import {
   Dialog,
@@ -124,6 +125,8 @@ function Assembler() {
       setBuilding(false);
       toast.success("Content is ready!");
     } catch (error) {
+      setBuilding(false);
+      setBuildingDone(false);
       console.error("Error building:", error);
       toast.error("Error while building");
     }
