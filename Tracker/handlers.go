@@ -10,8 +10,6 @@ import (
 	// "github.com/google/uuid"
 )
 
-
-
 type SegDet struct {
 	FileSegmentHash string `json:"fileSegmentHash"`
 	SegmentNumber   int8   `json:"segNum"`
@@ -89,8 +87,7 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 
 	mu.Lock()
 
-
-	rFile, err := os.Open(TRACKER_FILE_NAME)
+	rFile, err := os.Open(fmt.Sprintf("%s/%s", TRACKFILE_FOLDER, TRACKER_FILE_NAME))
 
 	if err != nil {
 		log.Println("Announce: ", err.Error())
@@ -135,8 +132,6 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tFile.Close()
 
-
-
 	segmentFileAddress := make([]SegmentFileAddress, len(body.FileSegments))
 	for i, seg := range body.FileSegments {
 		segmentFileAddress[i] = SegmentFileAddress{
@@ -147,8 +142,6 @@ func (t *Tunnel) NewContentAnnounce(w http.ResponseWriter, r *http.Request) {
 			SegAddress:      []string{body.UAddress},
 		}
 	}
-
-	
 
 	trackerCon := &TunnelTracerContent{
 		FileHash:         body.FileHash,

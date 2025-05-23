@@ -103,6 +103,7 @@ func (a *App) CheckIfAllSegmentAreAvaliable(allSeg []SegmentFileAddress) ([]Segm
 	needSeg, err := checkIfPeerHasSeg(allSeg)
 
 	if err != nil {
+		log.Println("CheckIF", err.Error())
 		return nil, err
 	}
 
