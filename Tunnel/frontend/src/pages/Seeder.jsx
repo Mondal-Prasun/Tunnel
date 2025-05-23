@@ -33,6 +33,7 @@ const schema = yup.object({
 
 function Seeder() {
   const url = localStorage.getItem("url");
+  const port = localStorage.getItem("port");
   const navigate = useNavigate();
   const [thumbnail, setThumbnail] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -62,7 +63,8 @@ function Seeder() {
         data.filePath,
         base64Thumbnail,
         data.title,
-        url
+        url,
+        port
       );
       setLoading(false);
       toast.success("Successfully uploaded!");
