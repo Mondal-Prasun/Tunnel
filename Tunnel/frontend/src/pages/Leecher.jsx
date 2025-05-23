@@ -95,7 +95,7 @@ function Leecher() {
       await FetchTrackerFile(url);
       console.log(data);
       setContents(data);
-      toast.success("Successfully fetched contents!");
+      toast.success("Successfully updated contents!", new Date().toLocaleTimeString());
     } catch (e) {
       console.log(e);
     }

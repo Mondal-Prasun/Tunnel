@@ -102,7 +102,7 @@ function Assembler() {
       const neededSegments = await CheckIfAllSegmentAreAvaliable(
         clickedContentFileSegments
       );
-      console.log("Needed Segments:");
+      console.log("Needed Segments:", neededSegments);
       setNeededFileSegments(neededSegments);
       setOpen(true);
     } catch (error) {
