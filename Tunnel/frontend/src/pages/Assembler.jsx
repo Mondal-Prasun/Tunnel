@@ -23,6 +23,7 @@ function Assembler() {
   const [open, setOpen] = useState(false);
   const [neededFileSegments, setNeededFileSegments] = useState([]);
   let [contents, setContents] = useState([]);
+  let[clickedContent, setClickedContent] = useState(null);
 
   // contents = [
   //   {
@@ -100,6 +101,7 @@ function Assembler() {
       const neededSegments = await CheckIfAllSegmentAreAvaliable(
         clickedContent.fileSegments
       );
+      setClickedContent(clickedContent);
       console.log("Needed Segments:", neededSegments);
       if (neededSegments === null) {
         setNeededFileSegments([]);
@@ -117,11 +119,10 @@ function Assembler() {
     try {
       console.log("Building...");
       setBuilding(true);
-      await MakeOriginaleFile();
-      setTimeout(() => {
-        setBuildingDone(true);
-        setBuilding(false);
-      }, 5000);
+      await MakeOriginaleFile(clickedContent?.fileHash);
+      setBuildingDone(true);
+      setBuilding(false);
+      toast.success("Content is ready!");
     } catch (error) {
       console.error("Error building:", error);
       toast.error("Error while building");
@@ -189,7 +190,7 @@ function Assembler() {
                     <p className="font-semibold">
                       File Size:{" "}
                       <span className="text-gray-500">
-                        {neededFileSegment.segFileSize / 8 / 1024} MB
+                        {neededFileSegment.segFileSize / 1024 / 1024} MB
                       </span>
                     </p>
                     <p className="font-semibold">
@@ -215,7 +216,11 @@ function Assembler() {
             <DialogFooter>
               <Button
                 className="bg-red-700 text-white cursor-pointer hover:bg-red-800 transition duration-200 ease-in-out shadow-xl/30"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setBuildingDone(false);
+                  setBuilding(false);
+                  setOpen(false);
+                }}
               >
                 Cancel
               </Button>
