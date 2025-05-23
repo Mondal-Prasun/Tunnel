@@ -8,9 +8,7 @@ function DashBoard() {
     <>
       <div className="h-screen flex w-full gap-4">
         <DesktopNav />
-        <div
-          className="flex-1 overflow-auto no-scrollbar"
-        >
+        <div className="flex-1 overflow-auto no-scrollbar">
           <main className="h-full w-full no-scrollbar">
             <Outlet />
           </main>

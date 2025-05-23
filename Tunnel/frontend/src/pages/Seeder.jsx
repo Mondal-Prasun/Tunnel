@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AnnounceCurrentFile } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const schema = yup.object({
   thumbnail: yup
@@ -33,13 +34,14 @@ function Seeder() {
   const url = localStorage.getItem("url");
   const navigate = useNavigate();
   const [thumbnail, setThumbnail] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { handleSubmit, register, formState } = useForm({
     resolver: yupResolver(schema),
   });
   const handleUpload = async (data) => {
     try {
       if (!thumbnail) {
-        alert("Please select a thumbnail");
+        toast.error("Please select a thumbnail");
         return;
       }
       const getBase64 = (file) => {
@@ -59,19 +61,21 @@ function Seeder() {
       };
       console.log(payload.filePath);
       console.log(payload.title);
-      console.log(payload.base64Thumbnail);
-      console.log("url: ",url);
-
+      console.log("base64 file: ", payload.thumbnail);
+      console.log("url: ", url);
+      setLoading(true);
       await AnnounceCurrentFile(
         data.filePath,
         base64Thumbnail,
         data.title,
         url
       );
+      setLoading(false);
+      toast.success("Successfully uploaded!");
       navigate("/leech");
     } catch (error) {
       console.error("Error uploading content:", error);
-      alert("Error uploading content. Please try again.");
+      toast.error("Error uploading content. Please try again.");
     }
     // Handle the upload logic here
   };
@@ -149,8 +153,14 @@ function Seeder() {
                 type="submit"
                 className="bg-gray-800 text-white cursor-pointer hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30 my-4"
               >
-                <CloudUpload />
-                Upload
+                {loading ? (
+                  "Uploading..."
+                ) : (
+                  <>
+                    <CloudUpload />
+                    Upload
+                  </>
+                )}
               </Button>
             </form>
           </div>
