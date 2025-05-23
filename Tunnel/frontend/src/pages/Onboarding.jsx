@@ -30,6 +30,7 @@ function Onboarding() {
   const handleLogin = async (data) => {
     try {
       localStorage.setItem("url", data.url);
+      localStorage.setItem("port", data.port);
       console.log("Login data:", data.port);
       await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
