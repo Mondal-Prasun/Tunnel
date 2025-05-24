@@ -10,6 +10,7 @@ import {
   MakeRequiredFile,
 } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const schema = yup.object({
   url: yup.string().url("Invalid URL").required("URL is required"),
@@ -29,18 +30,24 @@ function Onboarding() {
   });
   const handleLogin = async (data) => {
     try {
+      await FetchTrackerFile(data.url);
+      localStorage.setItem("connectError", false);
+    } catch (error) {
+      localStorage.setItem("connectError", true);
+    }
+    try {
       localStorage.setItem("url", data.url);
       localStorage.setItem("port", data.port);
       console.log("Login data:", data.port);
-      await FetchTrackerFile(data.url);
       await ListenToPeers(data.port.toString());
       await MakeRequiredFile();
       console.log("after ", data);
-      if (true) {
-        navigate("/leech");
-      }
+      // if (true) {
+      navigate("/leech");
+      // }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
+      toast.error(`Cannot start TCP at: ${data.port}`);
     }
   };
   return (
@@ -51,7 +58,10 @@ function Onboarding() {
             {screen === "Home" && (
               <>
                 <h2 className="bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
-                  Share anything with our <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Tunnel!</span>
+                  Share anything with our{" "}
+                  <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Tunnel!
+                  </span>
                 </h2>
                 <p className="max-w-xl mx-auto text-sm md:text-lg text-neutral-700 dark:text-neutral-400 text-center">
                   A TCP and LAN based Peer to Peer file sharing application that
@@ -77,7 +87,8 @@ function Onboarding() {
                   <div className="my-4">
                     <h4 className="text-4xl font-semibold">Connect 👋</h4>
                     <p className="text-gray-500 mt-3">
-                      Connect to your prefered <span className="font-bold">tracker...</span> 
+                      Connect to your prefered{" "}
+                      <span className="font-bold">tracker...</span>
                     </p>
                   </div>
                   <form

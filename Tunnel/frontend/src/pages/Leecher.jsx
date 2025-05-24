@@ -7,7 +7,7 @@ import {
   FetchTrackerFile,
   ListenToPeers,
   GetRequiredContent,
-  RequestRequiredSegments
+  RequestRequiredSegments,
 } from "../../wailsjs/go/main/App.js";
 import {
   Dialog,
@@ -20,7 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { set } from "react-hook-form";
 
 function Leecher() {
   const navigate = useNavigate();
@@ -94,10 +93,14 @@ function Leecher() {
   const handleCall = async () => {
     try {
       const data = await GetRequiredContent();
-      await FetchTrackerFile(url);
+      if (localStorage.getItem("connectError") === false) {
+        await FetchTrackerFile(url);
+      }
       console.log(data);
       setContents(data);
-      toast.success(`Successfully updated contents: ${new Date().toLocaleTimeString()}`);
+      toast.success(
+        `Successfully updated contents: ${new Date().toLocaleTimeString()}`
+      );
     } catch (e) {
       console.log(e);
     }
@@ -109,8 +112,8 @@ function Leecher() {
     }, 1000 * 60);
     return () => clearInterval(interval);
   }, []);
-  
-  const handleDownload = async() => {
+
+  const handleDownload = async () => {
     try {
       console.log("Download clicked");
       // Handle the download logic here
@@ -118,7 +121,7 @@ function Leecher() {
       await RequestRequiredSegments(clickedContent.fileHash);
       setDownloaded(true);
       setDownloading(false);
-      toast.success("Content successfully downloaded!")
+      toast.success("Content successfully downloaded!");
       // Simulate a 2-second download time
     } catch (error) {
       console.error("Error downloading content:", error);
@@ -128,14 +131,19 @@ function Leecher() {
   return (
     <>
       <section className="flex flex-col gap-4 w-full h-full p-4 relative">
-        <p>Port: {port}</p>
+        <p className="font-bold">
+          Port Number:{" "}
+          <span className="font-light">
+            {port ? port : "Port is not defined!"}
+          </span>
+        </p>
         <div className="absolute top-4 right-4 z-10">
           <button
             className="bg-white/40 hover:bg-white/60 text-gray-800 font-semibold py-2 px-4 rounded shadow transition"
             onClick={handleCall}
             type="button"
           >
-            &#x21bb; Refresh
+            &#x21bb;Refresh
           </button>
         </div>
         <section className="w-full md:w-[70%] lg:w-[50%] mx-auto md:h-[400px] rounded-lg md:block relative">
@@ -227,7 +235,8 @@ function Leecher() {
                         <p className="font-semibold">
                           File Size:{" "}
                           <span className="text-gray-500">
-                            {parseInt((fileSegment.segContentSize/1024)/1024)} MB
+                            {parseInt(fileSegment.segContentSize / 1024 / 1024)}{" "}
+                            MB
                           </span>
                         </p>
                         <p className="font-semibold">
