@@ -123,6 +123,11 @@ function Assembler() {
       await MakeOriginaleFile(clickedContent?.fileHash);
       setBuildingDone(true);
       setBuilding(false);
+      setOpen(false);
+      setNeededFileSegments([]);
+      setClickedContent(null);
+      handleGetRequitredContents();
+      console.log("Building done");
       toast.success("Content is ready!");
     } catch (error) {
       setBuilding(false);

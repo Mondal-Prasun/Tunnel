@@ -2,14 +2,12 @@ import { CloudUpload } from "lucide-react";
 import BackgroundImage from "../assets/seeder.png";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AnnounceCurrentFile } from "../../wailsjs/go/main/App.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { encode } from "@/utils/common";
-import base64 from "base-64";
 
 const schema = yup.object({
   thumbnail: yup
@@ -38,6 +36,7 @@ function Seeder() {
   const navigate = useNavigate();
   const [thumbnail, setThumbnail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
   const { handleSubmit, register, formState } = useForm({
     resolver: yupResolver(schema),
   });
@@ -47,8 +46,16 @@ function Seeder() {
         toast.error("Please select a thumbnail");
         return;
       }
-      
-      const base64Thumbnail = base64.encode(thumbnail.arrayBuffer);
+
+      const getBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      };
+      const base64Thumbnail = await getBase64(thumbnail);
       console.log("Base64 Thumbnail:", base64Thumbnail);
       const payload = {
         thumbnail: base64Thumbnail,
@@ -68,11 +75,19 @@ function Seeder() {
         port
       );
       setLoading(false);
+      setUploaded(true);
       toast.success("Successfully uploaded!");
       navigate("/leech");
     } catch (error) {
       console.error("Error uploading content:", error);
       toast.error("Error uploading content. Please try again.");
+      setLoading(false);
+      setUploaded(false);
+      setThumbnail(null);
+      setValue("thumbnail", null); // Reset the thumbnail input
+      setValue("title", ""); // Reset the title input
+      setValue("filePath", ""); // Reset the file path input
+      formState.errors = {}; // Clear all errors
     }
     // Handle the upload logic here
   };
@@ -149,6 +164,7 @@ function Seeder() {
               <Button
                 type="submit"
                 className="bg-gray-800 text-white cursor-pointer hover:bg-gray-900 transition duration-200 ease-in-out shadow-xl/30 my-4"
+                disabled={loading || uploaded}
               >
                 {loading ? (
                   "Uploading..."
