@@ -93,9 +93,8 @@ function Leecher() {
   const handleCall = async () => {
     try {
       const data = await GetRequiredContent();
-      if (localStorage.getItem("connectError") === false) {
-        await FetchTrackerFile(url);
-      }
+      await FetchTrackerFile(url);
+
       console.log(data);
       setContents(data);
       toast.success(
