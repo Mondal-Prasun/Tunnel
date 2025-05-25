@@ -125,7 +125,7 @@ function Assembler() {
             }}
           >
             <DialogTitle>
-              <h1>Download all segments</h1>
+              Download all segments
             </DialogTitle>
             <DialogHeader>
               {neededFileSegments && neededFileSegments.length > 0 ? (
