@@ -30,16 +30,11 @@ function Onboarding() {
   });
   const handleLogin = async (data) => {
     try {
-      await FetchTrackerFile(data.url);
-      localStorage.setItem("connectError", false);
-    } catch (error) {
-      localStorage.setItem("connectError", true);
-    }
-    try {
       localStorage.setItem("url", data.url);
       localStorage.setItem("port", data.port);
       console.log("Login data:", data.port);
       await ListenToPeers(data.port.toString());
+      await FetchTrackerFile(data.url);
       await MakeRequiredFile();
       console.log("after ", data);
       // if (true) {
@@ -142,7 +137,7 @@ function Onboarding() {
             )}
           </div>
         </section>
-        <section className="lg:flex w-full -scale-x-100 lg:w-1/3  h-full right-0">
+        <section className="lg:flex w-full hidden md:flex -scale-x-100 lg:w-1/3  h-full right-0">
           <img
             src={BackgroundImage}
             alt="Onboarding image"
