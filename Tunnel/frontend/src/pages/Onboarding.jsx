@@ -37,12 +37,9 @@ function Onboarding() {
       await FetchTrackerFile(data.url);
       await MakeRequiredFile();
       console.log("after ", data);
-      // if (true) {
       navigate("/leech");
-      // }
     } catch (error) {
       console.error("Error fetching tracker content:", error);
-      toast.error(`Cannot start TCP at: ${data.port}`);
     }
   };
   return (
